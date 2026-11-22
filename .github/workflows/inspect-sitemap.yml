@@ -1,0 +1,32 @@
+name: Inspect sitemap routing
+on:
+  push:
+    branches: [redesign/heritage-lightweight]
+    paths: [.github/workflows/inspect-sitemap.yml]
+permissions:
+  contents: read
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Preserve old static sitemap and verify dynamic route
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+          HOST: awt-c8-us.afgnoc.com
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$KEY" && test -n "$FINGERPRINT"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          unset KEY
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+          ssh -p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts" "restdevelopments@$HOST" '
+              root=/home/restdevelopments/public_html
+              find "$root" -maxdepth 2 -name sitemap.xml -printf "%p %u:%g %m\\n"
+              find "$root/bootstrap/cache" -maxdepth 1 -name "routes*.php" -printf "%p %u:%g %m\\n"
+              grep -n "sitemap.xml" "$root/routes/web.php"
+            '

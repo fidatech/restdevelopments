@@ -78,3 +78,32 @@ jobs:
               if [ -w "$views/06558d3cfa5495c494f2345d81f4e3c2.php" ]; then echo "Target writable: yes"; else echo "Target writable: no"; fi
               find "$views" -maxdepth 1 -type f ! -writable | wc -l
             '
+
+      - name: Preserve unwritable compiled views and regenerate
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+          HOST: awt-c8-us.afgnoc.com
+        run: |
+          set -euo pipefail
+          umask 077
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          unset KEY
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/deploy_known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/deploy_known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+          ssh -p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/deploy_known_hosts" "restdevelopments@$HOST" '
+              set -eu
+              umask 077
+              views=/home/restdevelopments/public_html/storage/framework/views
+              test -w "$views"
+              backup=$(mktemp -d "$HOME/restdevelopments-view-cache-backup.XXXXXXXX")
+              count=0
+              find "$views" -maxdepth 1 -type f -name "*.php" ! -writable -print0 |
+                while IFS= read -r -d "" path; do
+                  mv -- "$path" "$backup/$(basename "$path")"
+                  count=$((count + 1))
+                done
+              echo "Preserved unwritable compiled views at $backup"
+              echo "Remaining unwritable PHP views: $(find "$views" -maxdepth 1 -type f -name "*.php" ! -writable | wc -l)"
+            '

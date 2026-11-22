@@ -1,0 +1,55 @@
+name: Publish welcome popup
+on:
+  push:
+    branches: [import/main-site]
+    paths: [.github/workflows/publish-welcome-popup.yml]
+permissions:
+  contents: read
+concurrency: restdevelopments-welcome-popup
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 4728c787f7b7febbb97718929739d17329ba1aca
+          persist-credentials: false
+      - name: Verify server and replace the welcome layout
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+          HOST: awt-c8-us.afgnoc.com
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$KEY" && test -n "$FINGERPRINT"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          unset KEY
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/deploy_known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/deploy_known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+          ssh -p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes \
+            -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=yes \
+            -o "UserKnownHostsFile=$RUNNER_TEMP/deploy_known_hosts" "restdevelopments@$HOST" '
+              set -eu
+              umask 077
+              target=/home/restdevelopments/public_html/resources/views/layouts/base.blade.php
+              current=$(git hash-object -- "$target")
+              if [ "$current" = "597c55ccbe21644428b811ce50470fd9ef37fd9d" ]; then
+                echo "Welcome layout is already deployed"
+                exit 0
+              fi
+              if [ "$current" != "68d4038c36e2314835ec5a447bb16a18b28e4560" ]; then
+                echo "Live layout differs from the imported baseline. No files replaced."
+                exit 1
+              fi
+              backup=$(mktemp -d "$HOME/restdevelopments-popup-backup.XXXXXXXX")
+              cp -p -- "$target" "$backup/base.blade.php"
+              incoming=$(mktemp "$(dirname "$target")/.welcome-layout.XXXXXXXX")
+              cat > "$incoming"
+              test "$(git hash-object -- "$incoming")" = "597c55ccbe21644428b811ce50470fd9ef37fd9d"
+              chmod --reference="$target" "$incoming"
+              test "$(git hash-object -- "$target")" = "$current"
+              mv -T -- "$incoming" "$target"
+              echo "Welcome layout deployed. Original saved at $backup/base.blade.php"
+            ' < resources/views/layouts/base.blade.php

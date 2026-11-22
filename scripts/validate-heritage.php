@@ -15,6 +15,8 @@ $app->instance('request', $request);
 $kernel->bootstrap();
 $finder = $app->make('view.finder');
 $finder->setPaths([$stagedViews, $root.'/resources/views']);
+$finder->flush();
+echo 'Template: '.$finder->find('home.index').PHP_EOL;
 
 try {
     $response = $kernel->handle($request);
@@ -22,7 +24,7 @@ try {
     $valid = $response->getStatusCode() === 200
         && str_contains((string) $html, 'assets/css/heritage.css')
         && str_contains((string) $html, 'socialRedirectModal');
-    echo $uri.' HTTP '.$response->getStatusCode().' theme '.($valid ? 'OK' : 'FAILED').PHP_EOL;
+    echo $uri.' HTTP '.$response->getStatusCode().' CSS '.(str_contains((string) $html, 'assets/css/heritage.css') ? 'yes' : 'no').' popup '.(str_contains((string) $html, 'socialRedirectModal') ? 'yes' : 'no').' theme '.($valid ? 'OK' : 'FAILED').PHP_EOL;
     $kernel->terminate($request, $response);
     exit($valid ? 0 : 1);
 } catch (Throwable $exception) {

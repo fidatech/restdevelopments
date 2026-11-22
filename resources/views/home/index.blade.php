@@ -2,7 +2,9 @@
 @section('title', __('Homes and places with purpose'))
 @section('description', __('Explore Rest Developments, our residential and mixed-use projects, apartments and company story in Afghanistan and Uzbekistan.'))
 @section('content')
-@php($heroSlides = $sliders->isNotEmpty() ? $sliders : collect([null]))
+@php
+    $heroSlides = $sliders->isNotEmpty() ? $sliders : collect([null]);
+@endphp
 <section class="hero hero-carousel" aria-label="{{ __('Featured developments') }}" data-hero-carousel>
     <div class="hero-slides">
         @foreach($heroSlides as $index => $slide)

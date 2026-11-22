@@ -18,7 +18,7 @@ class HomeController extends Controller
             return Slider::with('translations')
                 ->where('status', 'published')
                 ->ordered()
-                ->take(1)->get();
+                ->take(4)->get();
         });
 
         $about = Cache::remember("site.about.setting.$locale", 60, function () {

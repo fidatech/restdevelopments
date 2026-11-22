@@ -49,7 +49,7 @@ jobs:
               cp -p -- "$target" "$backup/base.blade.php"
               incoming=$(mktemp "$(dirname "$target")/.welcome-layout.XXXXXXXX")
               cat > "$incoming"
-              test "$(git hash-object -- "$incoming")" = "597c55ccbe21644428b811ce50470fd9ef37fd9d"
+              test "$(git hash-object --no-filters "$incoming")" = "15b013f98fccf231e031ee86c7e49a31c979f3c5"
               chmod --reference="$target" "$incoming"
               test "$(git hash-object -- "$target")" = "$current"
               compiled=/home/restdevelopments/public_html/storage/framework/views/4758479ee14bef3bc79d3a5818eef33c.php

@@ -2,7 +2,7 @@ name: Validate heritage redesign on server
 on:
   push:
     branches: [redesign/heritage-lightweight]
-    paths: [.github/workflows/validate-heritage.yml, scripts/validate-heritage.php]
+    paths: [.github/workflows/validate-heritage.yml]
 permissions:
   contents: read
 jobs:
@@ -31,4 +31,4 @@ jobs:
           stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-heritage-stage.XXXXXXXX"')
           tar -cf - resources/views app/Http/Controllers/HomeController.php public/assets/css/heritage.css public/assets/js/heritage.js public/assets/img/rest-logo-small.webp scripts/validate-heritage.php | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
           echo "Staged source at $stage"
-          ssh "${ssh_opts[@]}" "$server" "php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/ && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/about && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/projects && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/latest-launches && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/contact && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/team && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/blog && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/careers"
+          ssh "${ssh_opts[@]}" "$server" "php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/ && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/about && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/projects && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/latest-launches && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/contact && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/team && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/blog && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /en/careers && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /__project && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /__blog && php '$stage/scripts/validate-heritage.php' '$stage/resources/views' /__career"

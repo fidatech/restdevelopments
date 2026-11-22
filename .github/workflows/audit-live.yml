@@ -1,5 +1,5 @@
 name: Audit live site
-# Rerun after accessibility release
+# Rerun after slider release
 on:
   push:
     branches: [redesign/heritage-lightweight]

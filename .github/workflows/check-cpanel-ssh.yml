@@ -1,0 +1,43 @@
+name: Check cPanel SSH
+on:
+  push:
+    branches: [import/main-site]
+    paths: [.github/workflows/check-cpanel-ssh.yml]
+permissions: {}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Validate key and test read-only SSH access
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          HOST: awt-c8-us.afgnoc.com
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT }}
+        run: |
+          set -euo pipefail
+          umask 077
+          if [[ -z "$KEY" ]]; then
+            echo "::error::DEPLOY_SSH_KEY is missing or unavailable"
+            exit 1
+          fi
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          unset KEY
+          ssh-keygen -y -P '' -f "$RUNNER_TEMP/deploy_key" >/dev/null
+          echo "Deployment secret contains a readable SSH private key"
+          if [[ -z "$FINGERPRINT" ]]; then
+            echo "::error::DEPLOY_HOST_FINGERPRINT is missing"
+            exit 1
+          fi
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/deploy_known_hosts"
+          actual=$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/deploy_known_hosts" | awk '{print $2}')
+          if [[ "$actual" != "$FINGERPRINT" ]]; then
+            echo "::error::Server host-key fingerprint did not match"
+            exit 1
+          fi
+          ssh -p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes \
+            -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=yes \
+            -o "UserKnownHostsFile=$RUNNER_TEMP/deploy_known_hosts" \
+            "restdevelopments@$HOST" \
+            'test -d /home/restdevelopments/public_html && test -r /home/restdevelopments/public_html'
+          echo "SSH authentication and site directory read access confirmed"

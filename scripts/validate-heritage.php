@@ -43,6 +43,14 @@ try {
     echo 'Stylesheets: '.implode(' | ', array_slice($styleTags[0], 0, 3)).PHP_EOL;
     echo $uri.' HTTP '.$response->getStatusCode().' CSS '.(str_contains((string) $html, 'assets/css/heritage.css') ? 'yes' : 'no').' popup '.(str_contains((string) $html, 'socialRedirectModal') ? 'yes' : 'no').' theme '.($valid ? 'OK' : 'FAILED').PHP_EOL;
 
+    if (!$valid) {
+        $log = $root.'/storage/logs/laravel.log';
+        if (is_file($log)) {
+            $tail = file_get_contents($log, false, null, max(0, filesize($log) - 65536));
+            preg_match_all('/^\\[20[^\\n]+\\] [^\\n]*ERROR: [^\\n]+/m', (string) $tail, $matches);
+            echo 'Recent error: '.substr((string) (end($matches[0]) ?: ''), 0, 500).PHP_EOL;
+        }
+    }
     exit($valid ? 0 : 1);
 } catch (Throwable $exception) {
     fwrite(STDERR, $uri.' '.get_class($exception).': '.$exception->getMessage().PHP_EOL);

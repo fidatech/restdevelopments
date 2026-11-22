@@ -28,6 +28,8 @@ jobs:
           unset KEY
           ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/deploy_known_hosts"
           test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/deploy_known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+          git show HEAD:resources/views/layouts/base.blade.php > "$RUNNER_TEMP/welcome-layout"
+          echo "Checkout blob $(git hash-object --no-filters "$RUNNER_TEMP/welcome-layout")"
           ssh -p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes \
             -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=yes \
             -o "UserKnownHostsFile=$RUNNER_TEMP/deploy_known_hosts" "restdevelopments@$HOST" '
@@ -54,4 +56,4 @@ jobs:
               if [ -f "$compiled" ]; then mv -- "$compiled" "$backup/"; fi
               mv -T -- "$incoming" "$target"
               echo "Welcome layout deployed. Original saved at $backup/base.blade.php"
-            ' < resources/views/layouts/base.blade.php
+            ' < "$RUNNER_TEMP/welcome-layout"

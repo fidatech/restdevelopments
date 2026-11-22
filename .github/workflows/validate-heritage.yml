@@ -2,7 +2,7 @@ name: Validate heritage redesign on server
 on:
   push:
     branches: [redesign/heritage-lightweight]
-    paths: [.github/workflows/validate-heritage.yml]
+    paths: [.github/workflows/validate-heritage.yml, scripts/validate-heritage.php]
 permissions:
   contents: read
 jobs:

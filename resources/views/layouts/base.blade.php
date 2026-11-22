@@ -427,13 +427,13 @@
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content rest-welcome">
                     <div class="rest-welcome__header">
-                        <button type="button" class="rest-welcome__close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="{{ __('Close') }}">
+                        <button type="button" class="rest-welcome__close" data-welcome-dismiss aria-label="{{ __('Close') }}">
                             <span aria-hidden="true">&times;</span>
                         </button>
                         <h2 id="socialRedirectLabel">{{ __('Welcome to Rest Developments') }}</h2>
                     </div>
                     <div class="modal-body rest-welcome__body">
-                        <button type="button" class="rest-welcome__primary" data-dismiss="modal" data-bs-dismiss="modal">
+                        <button type="button" class="rest-welcome__primary" data-welcome-dismiss>
                             <i class="fas fa-globe" aria-hidden="true"></i>
                             {{ __('Continue to website') }}
                         </button>
@@ -468,7 +468,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const popup = document.getElementById('socialRedirectModal');
-                const popupKey = 'socialPopupShown';
+                const popupKey = 'restWelcomeShown';
                 if (!popup || !window.bootstrap || !window.bootstrap.Modal) return;
 
                 try {
@@ -477,7 +477,11 @@
                     return;
                 }
 
-                new bootstrap.Modal(popup).show();
+                const modal = new bootstrap.Modal(popup);
+                popup.querySelectorAll('[data-welcome-dismiss]').forEach(function (button) {
+                    button.addEventListener('click', function () { modal.hide(); });
+                });
+                modal.show();
                 try { sessionStorage.setItem(popupKey, 'yes'); } catch (error) {}
             });
         </script>

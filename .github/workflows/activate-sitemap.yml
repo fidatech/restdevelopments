@@ -38,15 +38,18 @@ jobs:
           require __DIR__ . '/vendor/autoload.php';
           $app = require __DIR__ . '/bootstrap/app.php';
           $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+          Illuminate\Support\Facades\URL::forceRootUrl('https://restdevelopments.com');
+          Illuminate\Support\Facades\URL::forceScheme('https');
           echo $app->make(App\Http\Controllers\SitemapController::class)()->getContent();
           PHP
           grep -q '<urlset' "$generated"
-          grep -q '/en/projects' "$generated"
+          grep -q 'https://restdevelopments.com/en/projects' "$generated"
+          if grep -q 'localhost' "$generated"; then echo 'Local URL in sitemap'; exit 1; fi
           backup=$(mktemp -d "$HOME/restdevelopments-sitemap-backup.XXXXXXXX")
           cp -p -- "$old" "$backup/sitemap.xml"
           chmod 644 "$generated"
           mv -- "$generated" "$old"
-          if ! curl -fsSL --max-time 25 https://restdevelopments.com/sitemap.xml | grep -q '/en/projects'; then
+          if ! curl -fsSL --max-time 25 https://restdevelopments.com/sitemap.xml | grep -q 'https://restdevelopments.com/en/projects'; then
             cp -p -- "$backup/sitemap.xml" "$old"
             echo "Sitemap check failed; previous version restored."
             exit 1

@@ -21,7 +21,7 @@
                 <div class="hero-copy">
                     <div class="hero-copy-inner">
                         <span class="eyebrow">{{ __('Afghanistan · Uzbekistan · UAE') }}</span>
-                        @if($index === 0)<h1 id="home-heading">{{ $headline }}</h1>@else<h2>{{ $headline }}</h2>@endif
+                        <h1 @if($index === 0) id="home-heading" @endif>{{ $headline }}</h1>
                         <p class="lead">{{ $summary }}</p>
                         <div class="hero-actions">
                             <a class="button button-light" href="{{ $buttonUrl }}">{{ $buttonText }}</a>

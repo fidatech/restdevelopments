@@ -1,0 +1,27 @@
+name: Audit live site
+on:
+  push:
+    branches: [redesign/heritage-lightweight]
+    paths: [.github/workflows/audit-live.yml]
+permissions:
+  contents: read
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Measure mobile and desktop Lighthouse scores
+        run: |
+          set -euo pipefail
+          for mode in mobile desktop; do
+            args=()
+            if [ "$mode" = desktop ]; then args+=(--preset=desktop); fi
+            npx --yes lighthouse https://restdevelopments.com/ \
+              --chrome-flags="--headless --no-sandbox" \
+              --only-categories=performance,accessibility,best-practices,seo \
+              --output=json --output-path="/tmp/lighthouse-$mode.json" \
+              --quiet "${args[@]}"
+            echo "$mode"
+            jq -r '.categories | [.performance.score, .accessibility.score, ."best-practices".score, .seo.score] | map(. * 100 | round) | @tsv' "/tmp/lighthouse-$mode.json"
+            jq -r '.audits | [.["first-contentful-paint"].displayValue, .["largest-contentful-paint"].displayValue, .["total-blocking-time"].displayValue, .["cumulative-layout-shift"].displayValue] | @tsv' "/tmp/lighthouse-$mode.json"
+          done

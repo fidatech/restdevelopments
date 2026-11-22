@@ -37,7 +37,7 @@ jobs:
             echo "slide ".$slide->id."\n";
             foreach(['image','image_mobile'] as $field) {
               $relative=$slide->$field;
-              $file=$relative ? __DIR__.'/storage/app/public/'.$relative : '';
+              $file=$relative ? __DIR__.'/public/storage/'.$relative : '';
               $size=$file && is_file($file) ? filesize($file) : 0;
               $dimensions=$file && is_file($file) ? getimagesize($file) : null;
               echo $field.": ".($relative ?: 'none')." bytes=".$size." dimensions=".($dimensions ? $dimensions[0].'x'.$dimensions[1] : 'unknown')."\n";

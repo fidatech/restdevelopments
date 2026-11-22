@@ -39,7 +39,7 @@
             <a href="{{ route('latest-launches', ['locale'=>app()->getLocale()]) }}">{{ __('Latest launches') }}</a>
             <a href="{{ route('blog.index', ['locale'=>app()->getLocale()]) }}">{{ __('Journal') }}</a>
             <a href="{{ route('careers.index', ['locale'=>app()->getLocale()]) }}">{{ __('Careers') }}</a>
-            <a class="nav-contact" href="{{ route('contact', ['locale'=>app()->getLocale()]) }}">{{ __('Contact') }} <span aria-hidden="true">↗</span></a>
+            <a class="nav-contact" href="{{ route('contact', ['locale'=>app()->getLocale()]) }}">{{ __('Contact') }} <span aria-hidden="true"></span></a>
             <div class="languages" aria-label="{{ __('Language') }}">
                 @foreach(config('app.available_locales', ['en','ps','fa','uz']) as $language)
                     <a href="{{ route('lang.switch', ['locale'=>$language]) }}" lang="{{ $language }}" @if(app()->getLocale()===$language) aria-current="true" @endif>{{ strtoupper($language) }}</a>
@@ -63,8 +63,8 @@
     <section class="welcome-panel" role="dialog" aria-modal="true" aria-labelledby="socialRedirectLabel">
         <button class="welcome-close" type="button" data-welcome-dismiss aria-label="{{ __('Close') }}">×</button>
         <div class="welcome-heading"><span class="eyebrow">REST DEVELOPMENTS</span><h2 id="socialRedirectLabel">{{ __('Where would you like to go?') }}</h2><p>{{ __('Explore the website or connect with us.') }}</p></div>
-        <button class="button button-light welcome-continue" type="button" data-welcome-dismiss>{{ __('Continue to website') }} <span aria-hidden="true">↗</span></button>
-        <div class="welcome-links"><a href="https://www.facebook.com/share/1Bc9FitgQD/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook ↗</a><a href="https://www.instagram.com/restdevelopments?igsh=MTBibzh5NHVnbTZnaw%3D%3D&amp;utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="https://youtu.be/x4Fibo6XObs?si=PJWWInMGtG8Z6IPc" target="_blank" rel="noopener noreferrer">YouTube ↗</a><a href="https://t.me/rest_developments" target="_blank" rel="noopener noreferrer">Telegram ↗</a><a href="https://api.whatsapp.com/send?phone=+93777578657&amp;text=Hello%20Rest%20Developments" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a></div>
+        <button class="button button-light welcome-continue" type="button" data-welcome-dismiss>{{ __('Continue to website') }} <span aria-hidden="true"></span></button>
+        <div class="welcome-links"><a href="https://www.facebook.com/share/1Bc9FitgQD/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook </a><a href="https://www.instagram.com/restdevelopments?igsh=MTBibzh5NHVnbTZnaw%3D%3D&amp;utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram </a><a href="https://youtu.be/x4Fibo6XObs?si=PJWWInMGtG8Z6IPc" target="_blank" rel="noopener noreferrer">YouTube </a><a href="https://t.me/rest_developments" target="_blank" rel="noopener noreferrer">Telegram </a><a href="https://api.whatsapp.com/send?phone=+93777578657&amp;text=Hello%20Rest%20Developments" target="_blank" rel="noopener noreferrer">WhatsApp </a></div>
     </section>
 </div>
 <script src="{{ asset('assets/js/heritage.js') }}" defer></script>

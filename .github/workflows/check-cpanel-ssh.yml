@@ -13,7 +13,7 @@ jobs:
         env:
           KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           HOST: awt-c8-us.afgnoc.com
-          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
         run: |
           set -euo pipefail
           umask 077

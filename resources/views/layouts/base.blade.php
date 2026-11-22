@@ -248,32 +248,32 @@
 
 
         <style>
-            #socialRedirectModal .modal-dialog { max-width: 470px; }
+            #socialRedirectModal .modal-dialog { max-width: 470px; margin-inline: auto; padding-inline: 12px; }
             .rest-welcome {
                 border: 0;
-                border-radius: 20px;
+                border-radius: 16px;
                 overflow: hidden;
                 background: #fff;
-                box-shadow: 0 24px 64px rgba(27, 19, 43, .28);
+                box-shadow: 0 20px 50px rgba(0, 0, 0, .26);
             }
             .rest-welcome__header {
                 position: relative;
-                padding: 32px 52px 28px;
-                background: #2d1b46;
+                padding: 25px 48px;
+                background: #1c1c1c;
                 text-align: center;
             }
             .rest-welcome__header h2 {
                 color: #fff;
-                font-size: clamp(1.3rem, 5vw, 1.85rem);
-                line-height: 1.22;
+                font-size: clamp(1.25rem, 5vw, 1.6rem);
+                line-height: 1.3;
                 margin: 0;
             }
             .rest-welcome__close {
                 position: absolute;
-                inset-block-start: 8px;
-                inset-inline-end: 8px;
-                width: 44px;
-                height: 44px;
+                inset-block-start: 7px;
+                inset-inline-end: 7px;
+                width: 40px;
+                height: 40px;
                 border: 0;
                 border-radius: 50%;
                 background: transparent;
@@ -282,7 +282,7 @@
                 line-height: 1;
             }
             .rest-welcome__close:hover { background: rgba(255, 255, 255, .16); }
-            .rest-welcome__body { padding: clamp(16px, 5vw, 28px); }
+            .rest-welcome__body { padding: clamp(18px, 5vw, 28px); }
             .rest-welcome__primary {
                 display: flex;
                 gap: 10px;
@@ -292,38 +292,44 @@
                 min-height: 52px;
                 padding: 10px 16px;
                 border: 0;
-                border-radius: 12px;
-                background: #5d2aa2;
+                border-radius: 999px;
+                background: #005601;
                 color: #fff;
                 font-weight: 700;
             }
-            .rest-welcome__primary:hover { background: #48207e; }
+            .rest-welcome__primary:hover { background: #004400; }
             .rest-welcome__label {
-                margin: 20px 0 10px;
-                color: #4a4056;
-                font-weight: 600;
+                margin: 20px 0 12px;
+                color: #b45b00;
+                font-weight: 700;
+                text-align: center;
             }
             .rest-welcome__links {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 8px;
+                gap: 10px;
             }
             .rest-welcome__links a {
                 display: flex;
-                gap: 9px;
+                gap: 8px;
                 align-items: center;
+                justify-content: center;
                 min-height: 46px;
-                padding: 6px 10px;
-                border: 1px solid #e6dfef;
-                border-radius: 10px;
-                color: #31263d;
+                padding: 8px;
+                border-radius: 999px;
+                color: #fff;
                 font-size: .875rem;
-                font-weight: 600;
-                overflow-wrap: anywhere;
+                font-weight: 700;
+                text-align: center;
             }
-            .rest-welcome__links a:hover { background: #f5effb; color: #48207e; }
-            .rest-welcome__links i { color: #5d2aa2; font-size: 1rem; }
-            .rest-welcome :focus-visible { outline: 2px solid #7850a5; outline-offset: 2px; }
+            .rest-welcome__links a:hover { color: #fff; filter: brightness(.88); }
+            .rest-welcome__links i { color: #fff; font-size: 1rem; }
+            .rest-welcome__facebook { background: #1877F2; }
+            .rest-welcome__instagram { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
+            .rest-welcome__youtube { background: #FF0000; }
+            .rest-welcome__telegram { background: #0088cc; }
+            .rest-welcome__whatsapp { background: #25D366; }
+            .rest-welcome :focus-visible { outline: 2px solid #1c1c1c; outline-offset: 2px; }
             .rest-welcome__close:focus-visible { outline-color: #fff; }
         </style>
     </head>
@@ -430,32 +436,32 @@
                         <button type="button" class="rest-welcome__close" data-welcome-dismiss aria-label="{{ __('Close') }}">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h2 id="socialRedirectLabel">{{ __('Welcome to Rest Developments') }}</h2>
+                        <h2 id="socialRedirectLabel">{{ __('Connect with Rest Developments') }}</h2>
                     </div>
                     <div class="modal-body rest-welcome__body">
                         <button type="button" class="rest-welcome__primary" data-welcome-dismiss>
                             <i class="fas fa-globe" aria-hidden="true"></i>
                             {{ __('Continue to website') }}
                         </button>
-                        <p class="rest-welcome__label">{{ __('Connect with us') }}</p>
+                        <p class="rest-welcome__label">{{ __('Choose where you’d like to go:') }}</p>
                         <div class="rest-welcome__links">
-                            <a href="https://www.facebook.com/share/1Bc9FitgQD/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">
+                            <a class="rest-welcome__facebook" href="https://www.facebook.com/share/1Bc9FitgQD/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-facebook-f" aria-hidden="true"></i>
                                 <span>Facebook</span>
                             </a>
-                            <a href="https://www.instagram.com/restdevelopments?igsh=MTBibzh5NHVnbTZnaw%3D%3D&amp;utm_source=qr" target="_blank" rel="noopener noreferrer">
+                            <a class="rest-welcome__instagram" href="https://www.instagram.com/restdevelopments?igsh=MTBibzh5NHVnbTZnaw%3D%3D&amp;utm_source=qr" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-instagram" aria-hidden="true"></i>
                                 <span>Instagram</span>
                             </a>
-                            <a href="https://youtu.be/x4Fibo6XObs?si=PJWWInMGtG8Z6IPc" target="_blank" rel="noopener noreferrer">
+                            <a class="rest-welcome__youtube" href="https://youtu.be/x4Fibo6XObs?si=PJWWInMGtG8Z6IPc" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-youtube" aria-hidden="true"></i>
                                 <span>YouTube</span>
                             </a>
-                            <a href="https://t.me/rest_developments" target="_blank" rel="noopener noreferrer">
+                            <a class="rest-welcome__telegram" href="https://t.me/rest_developments" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-telegram-plane" aria-hidden="true"></i>
                                 <span>Telegram</span>
                             </a>
-                            <a href="https://api.whatsapp.com/send?phone=+93777578657&amp;text=Hello%20Rest%20Developments" target="_blank" rel="noopener noreferrer">
+                            <a class="rest-welcome__whatsapp" href="https://api.whatsapp.com/send?phone=+93777578657&amp;text=Hello%20Rest%20Developments" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-whatsapp" aria-hidden="true"></i>
                                 <span>WhatsApp</span>
                             </a>

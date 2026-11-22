@@ -250,6 +250,7 @@
         <style>
             #socialRedirectModal .modal-dialog { max-width: 470px; margin-inline: auto; padding-inline: 12px; }
             #socialRedirectModal .rest-welcome {
+                padding: 0 !important;
                 border: 0;
                 background: #fff !important;
                 border-radius: 16px;

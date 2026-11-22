@@ -1,0 +1,42 @@
+name: Activate generated sitemap
+on:
+  push:
+    branches: [redesign/heritage-lightweight]
+    paths: [.github/workflows/activate-sitemap.yml]
+permissions:
+  contents: read
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Preserve old static sitemap and verify dynamic route
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+          HOST: awt-c8-us.afgnoc.com
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$KEY" && test -n "$FINGERPRINT"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          unset KEY
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+          ssh -p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts" "restdevelopments@$HOST" '
+              set -eu
+              root=/home/restdevelopments/public_html
+              cd "$root"
+              php artisan route:list --path=sitemap --compact 2>/dev/null || php artisan route:list --path=sitemap
+              old="$root/sitemap.xml"
+              test -f "$old" && test ! -L "$old"
+              backup=$(mktemp -d "$HOME/restdevelopments-sitemap-backup.XXXXXXXX")
+              mv -- "$old" "$backup/sitemap.xml"
+              if ! curl -fsSL --max-time 20 https://restdevelopments.com/sitemap.xml | grep -q "/en/projects"; then
+                mv -- "$backup/sitemap.xml" "$old"
+                echo "Dynamic sitemap check failed; previous static sitemap restored."
+                exit 1
+              fi
+              echo "Generated sitemap active. Old sitemap saved at $backup/sitemap.xml"
+            '

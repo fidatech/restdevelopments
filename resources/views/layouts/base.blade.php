@@ -473,12 +473,13 @@
 
                 try {
                     if (sessionStorage.getItem(popupKey)) return;
-                    sessionStorage.setItem(popupKey, 'yes');
+                    
                 } catch (error) {
                     return;
                 }
 
-                bootstrap.Modal.getOrCreateInstance(popup).show();
+                new bootstrap.Modal(popup).show();
+                try { sessionStorage.setItem(popupKey, 'yes'); } catch (error) {}
             });
         </script>
 

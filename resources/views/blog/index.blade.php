@@ -1,61 +1,6 @@
-@extends('layouts.base')
-
-@section('title','Blog')
-
+@extends('layouts.heritage')
+@section('title', __('Journal'))
+@section('description', __('Company news, project updates and stories from Rest Developments.'))
 @section('content')
-<!--============================== Breadcumb ==============================-->
-<div class="breadcumb-wrapper" data-bg-src="{{ asset('assets/img/bg/about-us-breadcrumb.webp') }}">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-xl-9">
-                <div class="breadcumb-content">
-                    <h1 class="breadcumb-title">Blog Post</h1>
-                    <ul class="breadcumb-menu">
-                        <li><a href="{{ url('/') }}">Home</a></li>
-                        <li>Blog</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!--============================== Blog Area ==============================-->
-<section class="th-blog-wrapper space-top space-extra-bottom">
-    <div class="container">
-        <div class="row">
-            <div class="col-xxl-8 col-lg-7">
-
-                @foreach($blogs as $blog)
-                <div class="th-blog blog-single has-post-thumbnail">
-                    <div class="blog-img">
-                        <a href="{{ route('blog.show', $blog->slug) }}">
-                            <img src="{{ asset('storage/'.$blog->thumb_large) }}" alt="{{ $blog->t()?->title }}">
-                        </a>
-                    </div>
-                    <div class="blog-content">
-                        <div class="blog-meta">
-                            <span><i class="far fa-clock"></i>{{ $blog->created_at->format('d M, Y') }}</span>
-                        </div>
-                        <h2 class="blog-title">
-                            <a href="{{ route('blog.show', $blog->slug) }}">{{ $blog->t()?->title }}</a>
-                        </h2>
-                        <p class="blog-text">{!! \Str::limit($blog->t()?->content, 170) !!}</p>
-                        <a href="{{ route('blog.show', $blog->slug) }}" class="th-btn style-border2 th-btn-icon">Read More</a>
-                    </div>
-                </div>
-                @endforeach
-
-                <div class="th-pagination">
-                    {{ $blogs->links() }}
-                </div>
-            </div>
-
-            <!-- sidebar -->
-            <div class="col-xxl-4 col-lg-5">
-                @include('blog.blog-sidebar')
-            </div>
-        </div>
-    </div>
-</section>
+<div class="page-intro"><div class="wrap"><span class="eyebrow">{{ __('Journal') }}</span><h1>{{ __('Stories from Rest.') }}</h1><p class="lead">{{ __('News, ideas and updates from our developments.') }}</p></div></div><section class="section"><div class="wrap"><div class="cards">@forelse($blogs as $post)<article class="card"><a href="{{ route('blog.show', ['locale'=>app()->getLocale(), 'slug'=>$post->slug]) }}"><div class="card-media">@if($post->thumb_large)<img src="{{ asset('storage/'.$post->thumb_large) }}" alt="{{ $post->t()?->title }}" loading="lazy" width="640" height="480">@endif</div><div class="card-body"><span class="eyebrow">{{ $post->created_at?->format('d M Y') }}</span><h3>{{ $post->t()?->title }}</h3><p>{{ \Illuminate\Support\Str::limit(strip_tags($post->t()?->content ?? ''), 150) }}</p><span class="text-link">{{ __('Read story') }} ↗</span></div></a></article>@empty<p class="empty">{{ __('No stories are available yet.') }}</p>@endforelse</div><div class="pagination">{{ $blogs->links() }}</div></div></section>
 @endsection

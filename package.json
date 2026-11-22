@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@fortawesome/fontawesome-free": "^7.0.0",
+        "@popperjs/core": "^2.11.8",
+        "@tailwindcss/vite": "^4.0.0",
+        "alpinejs": "^3.4.2",
+        "axios": "^1.11.0",
+        "bootstrap": "^5.3.7",
+        "concurrently": "^9.0.1",
+        "jquery": "^3.7.1",
+        "jquery-datetimepicker": "^2.5.21",
+        "laravel-vite-plugin": "^2.0.0",
+        "magnific-popup": "^1.2.0",
+        "sass-embedded": "^1.90.0",
+        "swiper": "^11.2.10",
+        "vite": "^7.0.4"
+    }
+}

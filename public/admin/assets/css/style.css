@@ -1,0 +1,123 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&family=Muli:wght@300;400;600;700&family=Yesteryear&display=swap');
+
+/* Font Mapping */
+body, .app-content {
+    font-family: 'Muli', sans-serif;
+    font-size: 14px;
+    color: #444;
+    line-height: 1.6;
+}
+/* Custom black navbar background */
+.header-navbar.bg-black {
+    background-color: #000 !important;
+}
+
+.header-navbar.bg-dark-blue {
+    background-color: #111827 !important; /* Tailwind-style dark navy */
+}
+
+
+/* Brand / Logo Text */
+.brand-text, .main-brand, .logo-text {
+    font-family: 'Comfortaa', cursive; /* Winky Rough-style font */
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    color: #512da8;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+
+/* Section Titles */
+.section-title,
+.content-header-title,
+.card-header h5,
+.fb-header h5 {
+    font-family: 'Comfortaa', cursive;
+    font-weight: 700;
+    color: #4527a0;
+    font-size: 1.6rem;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Comfortaa', sans-serif;
+    font-weight: 600;
+    color: #2c2c2c;
+}
+
+/* Navbar and Menu Text */
+
+.navbar-nav .nav-link,
+.dropdown-menu .dropdown-item {
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+
+    .card-shadow {
+        position: absolute;
+        bottom: -8px;
+        left: 10%;
+        width: 80%;
+        height: 20px;
+        background: rgba(0,0,0,0.4);
+        border-radius: 50%;
+        filter: blur(12px);
+        z-index: 1;
+        transform: translateZ(-5px) scale(0.95);
+        transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    .card-body {
+        position: relative;
+        z-index: 2;
+        padding: 30px;
+        height: 100%;
+        background: inherit;
+        border-radius: inherit;
+        box-shadow:
+            0 4px 8px rgba(0,0,0,0.1),
+            0 6px 12px rgba(0,0,0,0.15),
+            0 15px 30px rgba(0,0,0,0.2);
+        transform: translateZ(10px);
+        transition: inherit;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .card-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 12px 0;
+        line-height: 1;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .card-desc {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-top: auto;
+        margin-bottom: 0;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 768px) {
+        .card-value {
+            font-size: 2rem;
+        }
+
+        .desk-card {
+            transform: perspective(300px) rotateX(3deg);
+        }
+    }

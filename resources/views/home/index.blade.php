@@ -14,8 +14,10 @@
                 $buttonText = $tr?->button_text ?: __('Explore our projects');
                 $desktop = $slide?->image ? asset('storage/'.$slide->image) : null;
                 $mobile = $slide?->image_mobile ? asset('storage/'.$slide->image_mobile) : $desktop;
-                $desktopOptimized = $slide && is_file(public_path('assets/img/slider/slide-'.$slide->id.'-desktop.webp')) ? asset('assets/img/slider/slide-'.$slide->id.'-desktop.webp') : $desktop;
-                $mobileOptimized = $slide && is_file(public_path('assets/img/slider/slide-'.$slide->id.'-mobile.webp')) ? asset('assets/img/slider/slide-'.$slide->id.'-mobile.webp') : $mobile;
+                $desktopFile = $slide?->image ? 'assets/img/slider/slide-'.$slide->id.'-'.substr(sha1($slide->image), 0, 10).'-desktop.webp' : null;
+                $mobileFile = $slide && ($slide->image_mobile ?: $slide->image) ? 'assets/img/slider/slide-'.$slide->id.'-'.substr(sha1($slide->image_mobile ?: $slide->image), 0, 10).'-mobile.webp' : null;
+                $desktopOptimized = $desktopFile && is_file(public_path($desktopFile)) ? asset($desktopFile) : $desktop;
+                $mobileOptimized = $mobileFile && is_file(public_path($mobileFile)) ? asset($mobileFile) : $mobile;
             @endphp
             <article class="hero-slide{{ $index === 0 ? ' is-active' : '' }}" data-hero-slide @if($index > 0) hidden @endif>
                 <div class="hero-copy">

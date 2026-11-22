@@ -19,6 +19,19 @@ $finder->flush();
 echo 'Template: '.$finder->find('home.index').PHP_EOL;
 echo 'Layout: '.$finder->find('layouts.heritage').PHP_EOL;
 echo 'Factory: '.$app->make('view')->getFinder()->find('home.index').PHP_EOL;
+$details = [
+    '/__project' => [App\Models\Project::class, '/en/projects/'],
+    '/__blog' => [App\Models\Blog::class, '/en/blog/'],
+    '/__career' => [App\Models\Vacancy::class, '/en/careers/'],
+];
+if (isset($details[$uri])) {
+    [$model, $prefix] = $details[$uri];
+    $slug = $model::query()->value('slug');
+    if (!$slug) { echo $uri.' no content to validate'.PHP_EOL; exit(0); }
+    $uri = $prefix.rawurlencode($slug);
+    $request = Request::create('https://restdevelopments.com'.$uri, 'GET');
+    $app->instance('request', $request);
+}
 
 try {
     $response = $app->make('router')->dispatch($request);

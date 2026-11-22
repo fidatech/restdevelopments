@@ -1,0 +1,51 @@
+name: Publish slider polish
+on:
+  push:
+    branches: [redesign/heritage-lightweight]
+    paths: [.github/workflows/publish-slider-polish.yml]
+permissions:
+  contents: read
+concurrency: restdevelopments-public-theme
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 5d19f925ec40424f1fac3efdb408f41ec3b0fb57
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check slider JavaScript
+        run: node --check public/assets/js/heritage.js
+      - name: Back up and publish slider polish
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+          HOST: awt-c8-us.afgnoc.com
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$KEY" && test -n "$FINGERPRINT"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          unset KEY
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          files=(
+            resources/views/home/index.blade.php
+            public/assets/css/heritage.css
+            public/assets/js/heritage.js
+          )
+          : > heritage-manifest.tsv
+          for path in "${files[@]}"; do
+            if expected=$(git rev-parse --verify "c0684f2e1bef3b2f20fcf3b489370dbd5752d0d1:$path" 2>/dev/null); then
+              printf '%s\t%s\n' "$expected" "$path" >> heritage-manifest.tsv
+            else
+              printf 'NEW\t%s\n' "$path" >> heritage-manifest.tsv
+            fi
+          done
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-heritage-release.XXXXXXXX"')
+          tar -cf - "${files[@]}" scripts/deploy-heritage.sh heritage-manifest.tsv | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          ssh "${ssh_opts[@]}" "$server" "bash '$stage/scripts/deploy-heritage.sh' '$stage'"

@@ -33,23 +33,12 @@ jobs:
             -o "UserKnownHostsFile=$RUNNER_TEMP/deploy_known_hosts" "restdevelopments@$HOST" '
               set -eu
               umask 077
-              target=/home/restdevelopments/public_html/resources/views/layouts/base.blade.php
-              current=$(git hash-object -- "$target")
-              if [ "$current" = "597c55ccbe21644428b811ce50470fd9ef37fd9d" ]; then
-                echo "Welcome layout is already deployed"
-                exit 0
+              cache=/home/restdevelopments/public_html/storage/framework/views
+              compiled="$cache/4758479ee14bef3bc79d3a5818eef33c.php"
+              stat -c "%a %U %G %n" "$cache" "$compiled"
+              chmod u+rwx "$cache"
+              if [ -f "$compiled" ]; then
+                backup=$(mktemp -d "$HOME/restdevelopments-popup-cache.XXXXXXXX")
+                mv -- "$compiled" "$backup/"
               fi
-              if [ "$current" != "68d4038c36e2314835ec5a447bb16a18b28e4560" ]; then
-                echo "Live layout differs from the imported baseline. No files replaced."
-                exit 1
-              fi
-              backup=$(mktemp -d "$HOME/restdevelopments-popup-backup.XXXXXXXX")
-              cp -p -- "$target" "$backup/base.blade.php"
-              incoming=$(mktemp "$(dirname "$target")/.welcome-layout.XXXXXXXX")
-              cat > "$incoming"
-              test "$(git hash-object -- "$incoming")" = "597c55ccbe21644428b811ce50470fd9ef37fd9d"
-              chmod --reference="$target" "$incoming"
-              test "$(git hash-object -- "$target")" = "$current"
-              mv -T -- "$incoming" "$target"
-              echo "Welcome layout deployed. Original saved at $backup/base.blade.php"
-            ' < resources/views/layouts/base.blade.php
+            ' </dev/null

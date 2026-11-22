@@ -1,0 +1,58 @@
+name: Publish heritage polish
+on:
+  push:
+    branches: [redesign/heritage-lightweight]
+    paths: [.github/workflows/publish-heritage-polish.yml]
+permissions:
+  contents: read
+concurrency: restdevelopments-public-theme
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: 69a1949deea3dacf8340b766587d41c083f50e5c
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify host, back up current source, and publish public theme
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+          HOST: awt-c8-us.afgnoc.com
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$KEY" && test -n "$FINGERPRINT"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          unset KEY
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          files=(
+            public/assets/css/heritage.css
+            public/assets/img/heritage-tile.svg
+            resources/views/blog/index.blade.php
+            resources/views/careers/index.blade.php
+            resources/views/careers/show.blade.php
+            resources/views/home/index.blade.php
+            resources/views/layouts/heritage.blade.php
+            resources/views/pages/about.blade.php
+            resources/views/pages/contact.blade.php
+            resources/views/partials/heritage-project-card.blade.php
+            resources/views/projects/index.blade.php
+            resources/views/projects/show.blade.php
+          )
+          : > heritage-manifest.tsv
+          for path in "${files[@]}"; do
+            if expected=$(git rev-parse --verify "a3479a36aaf63f18eb0fbd87131c75be12b84dc2:$path" 2>/dev/null); then
+              printf '%s\t%s\n' "$expected" "$path" >> heritage-manifest.tsv
+            else
+              printf 'NEW\t%s\n' "$path" >> heritage-manifest.tsv
+            fi
+          done
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-heritage-release.XXXXXXXX"')
+          tar -cf - "${files[@]}" scripts/deploy-heritage.sh heritage-manifest.tsv | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          ssh "${ssh_opts[@]}" "$server" "bash '$stage/scripts/deploy-heritage.sh' '$stage'"

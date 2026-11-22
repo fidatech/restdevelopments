@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: cda408843670993674f720b9c5bd342aa700bc47
+          ref: af6bd108dcb88802ed29a0b95851eb64893e03d8
           persist-credentials: false
       - name: Verify server and replace the welcome layout
         env:
@@ -37,11 +37,11 @@ jobs:
               umask 077
               target=/home/restdevelopments/public_html/resources/views/layouts/base.blade.php
               current=$(git hash-object -- "$target")
-              if [ "$current" = "15b013f98fccf231e031ee86c7e49a31c979f3c5" ]; then
+              if [ "$current" = "515b3fc31714562487a21c1e8ae17d2a28d9b5b7" ]; then
                 echo "Welcome layout is already deployed"
                 exit 0
               fi
-              if [ "$current" != "597c55ccbe21644428b811ce50470fd9ef37fd9d" ]; then
+              if [ "$current" != "15b013f98fccf231e031ee86c7e49a31c979f3c5" ]; then
                 echo "Live layout differs from the imported baseline. No files replaced."
                 exit 1
               fi
@@ -49,7 +49,7 @@ jobs:
               cp -p -- "$target" "$backup/base.blade.php"
               incoming=$(mktemp "$(dirname "$target")/.welcome-layout.XXXXXXXX")
               cat > "$incoming"
-              test "$(git hash-object --no-filters "$incoming")" = "15b013f98fccf231e031ee86c7e49a31c979f3c5"
+              test "$(git hash-object --no-filters "$incoming")" = "515b3fc31714562487a21c1e8ae17d2a28d9b5b7"
               chmod --reference="$target" "$incoming"
               test "$(git hash-object -- "$target")" = "$current"
               compiled=/home/restdevelopments/public_html/storage/framework/views/4758479ee14bef3bc79d3a5818eef33c.php

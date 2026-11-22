@@ -247,6 +247,85 @@
 @stack('schema')
 
 
+        <style>
+            #socialRedirectModal .modal-dialog { max-width: 470px; }
+            .rest-welcome {
+                border: 0;
+                border-radius: 20px;
+                overflow: hidden;
+                background: #fff;
+                box-shadow: 0 24px 64px rgba(27, 19, 43, .28);
+            }
+            .rest-welcome__header {
+                position: relative;
+                padding: 32px 52px 28px;
+                background: #2d1b46;
+                text-align: center;
+            }
+            .rest-welcome__header h2 {
+                color: #fff;
+                font-size: clamp(1.3rem, 5vw, 1.85rem);
+                line-height: 1.22;
+                margin: 0;
+            }
+            .rest-welcome__close {
+                position: absolute;
+                inset-block-start: 8px;
+                inset-inline-end: 8px;
+                width: 44px;
+                height: 44px;
+                border: 0;
+                border-radius: 50%;
+                background: transparent;
+                color: #fff;
+                font-size: 1.75rem;
+                line-height: 1;
+            }
+            .rest-welcome__close:hover { background: rgba(255, 255, 255, .16); }
+            .rest-welcome__body { padding: clamp(16px, 5vw, 28px); }
+            .rest-welcome__primary {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                min-height: 52px;
+                padding: 10px 16px;
+                border: 0;
+                border-radius: 12px;
+                background: #5d2aa2;
+                color: #fff;
+                font-weight: 700;
+            }
+            .rest-welcome__primary:hover { background: #48207e; }
+            .rest-welcome__label {
+                margin: 20px 0 10px;
+                color: #4a4056;
+                font-weight: 600;
+            }
+            .rest-welcome__links {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+            .rest-welcome__links a {
+                display: flex;
+                gap: 9px;
+                align-items: center;
+                min-height: 46px;
+                padding: 6px 10px;
+                border: 1px solid #e6dfef;
+                border-radius: 10px;
+                color: #31263d;
+                font-size: .875rem;
+                font-weight: 600;
+                overflow-wrap: anywhere;
+            }
+            .rest-welcome__links a:hover { background: #f5effb; color: #48207e; }
+            .rest-welcome__links i { color: #5d2aa2; font-size: 1rem; }
+            .rest-welcome :focus-visible { outline: 2px solid #7850a5; outline-offset: 2px; }
+            .rest-welcome__close:focus-visible { outline-color: #fff; }
+        </style>
     </head>
 
     <body class="bg-smoke">
@@ -344,72 +423,62 @@
 ==============================-->
         @include('partials.footer')
 
-        <!-- Social Redirect Popup -->
         <div class="modal fade" id="socialRedirectModal" tabindex="-1" aria-labelledby="socialRedirectLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content text-center" style="border-radius:16px;">
-            <div class="modal-header justify-content-center border-0" style="background:#1c1c1c; border-radius:16px 16px 0 0;">
-                <h5 class="modal-title fw-bold text-white" id="socialRedirectLabel">Connect with Rest Developments</h5>
-            </div>
-            <div class="modal-body">
-                <p class="mb-4" style="color: orange; text-shadow: 1px 1px 2px #000;">Choose where you’d like to go:</p>
-                <div class="d-flex justify-content-center mb-4 flex-wrap gap-3">
-
-                    <!-- Website (neutral dark) -->
-                    <a href="{{ url('/') }}" class="btn rounded-pill px-4 py-2" style="background:#005601; color:#fff;">
-                        <i class="fas fa-globe me-2"></i> Website
-                    </a>
-
-                    <!-- Facebook -->
-                    <a href="https://www.facebook.com/share/1Bc9FitgQD/?mibextid=wwXIfr" target="_blank"
-                       class="btn rounded-pill px-4 py-2" style="background:#1877F2; color:#fff;">
-                        <i class="fab fa-facebook-f me-2"></i> Facebook
-                    </a>
-
-                    <!-- Instagram (gradient) -->
-                    <a href="https://www.instagram.com/restdevelopments?igsh=MTBibzh5NHVnbTZnaw%3D%3D&utm_source=qr" target="_blank"
-                       class="btn rounded-pill px-4 py-2 text-white"
-                       style="background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af,#515bd4);">
-                        <i class="fab fa-instagram me-2"></i> Instagram
-                    </a>
-
-                    <!-- YouTube -->
-                    <a href="https://youtu.be/x4Fibo6XObs?si=PJWWInMGtG8Z6IPc" target="_blank"
-                       class="btn rounded-pill px-4 py-2" style="background:#FF0000; color:#fff;">
-                        <i class="fab fa-youtube me-2"></i> YouTube
-                    </a>
-
-                    <!-- Telegram -->
-                    <a href="https://t.me/rest_developments" target="_blank"
-                       class="btn rounded-pill px-4 py-2" style="background:#0088cc; color:#fff;">
-                        <i class="fab fa-telegram-plane me-2"></i> Telegram
-                    </a>
-
-                    <!-- WhatsApp -->
-                    <a href="https://api.whatsapp.com/send?phone=+93777578657&text=Hello%20Rest%20Developments" target="_blank"
-                       class="btn rounded-pill px-4 py-2" style="background:#25D366; color:#fff;">
-                        <i class="fab fa-whatsapp me-2"></i> WhatsApp
-                    </a>
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content rest-welcome">
+                    <div class="rest-welcome__header">
+                        <button type="button" class="rest-welcome__close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h2 id="socialRedirectLabel">{{ __('Welcome to Rest Developments') }}</h2>
+                    </div>
+                    <div class="modal-body rest-welcome__body">
+                        <button type="button" class="rest-welcome__primary" data-bs-dismiss="modal">
+                            <i class="fas fa-globe" aria-hidden="true"></i>
+                            {{ __('Continue to website') }}
+                        </button>
+                        <p class="rest-welcome__label">{{ __('Connect with us') }}</p>
+                        <div class="rest-welcome__links">
+                            <a href="https://www.facebook.com/share/1Bc9FitgQD/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                                <span>Facebook</span>
+                            </a>
+                            <a href="https://www.instagram.com/restdevelopments?igsh=MTBibzh5NHVnbTZnaw%3D%3D&amp;utm_source=qr" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-instagram" aria-hidden="true"></i>
+                                <span>Instagram</span>
+                            </a>
+                            <a href="https://youtu.be/x4Fibo6XObs?si=PJWWInMGtG8Z6IPc" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-youtube" aria-hidden="true"></i>
+                                <span>YouTube</span>
+                            </a>
+                            <a href="https://t.me/rest_developments" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-telegram-plane" aria-hidden="true"></i>
+                                <span>Telegram</span>
+                            </a>
+                            <a href="https://api.whatsapp.com/send?phone=+93777578657&amp;text=Hello%20Rest%20Developments" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
 
         <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                const popupKey = "socialPopupShown";
+            document.addEventListener('DOMContentLoaded', function () {
+                const popup = document.getElementById('socialRedirectModal');
+                const popupKey = 'socialPopupShown';
+                if (!popup || !window.bootstrap || !window.bootstrap.Modal) return;
 
-                // If not shown in this session
-                if (!sessionStorage.getItem(popupKey)) {
-                    var myModal = new bootstrap.Modal(document.getElementById('socialRedirectModal'), {
-                        backdrop: 'static',
-                        keyboard: false
-                    });
-                    myModal.show();
-                    sessionStorage.setItem(popupKey, "yes"); // save for this session
+                try {
+                    if (sessionStorage.getItem(popupKey)) return;
+                    sessionStorage.setItem(popupKey, 'yes');
+                } catch (error) {
+                    return;
                 }
+
+                bootstrap.Modal.getOrCreateInstance(popup).show();
             });
         </script>
 

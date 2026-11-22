@@ -8,13 +8,21 @@
     @php
         $pageTitle = trim($__env->yieldContent('title')) ?: 'Rest Developments';
         $pageDescription = trim($__env->yieldContent('description')) ?: 'Rest Developments creates residential and mixed-use places in Afghanistan and Uzbekistan. Explore our company and projects.';
-        $canonical = url()->current();
+        $pageRoute = request()->route()?->getName();
+        $routeParameters = request()->route()?->parameters() ?? [];
+        $publicRoute = in_array($pageRoute, ['home','about','projects.index','projects.show','latest-launches','blog.index','blog.show','team.index','careers.index','careers.show','contact'], true);
+        $canonical = $publicRoute ? route($pageRoute, array_merge($routeParameters, ['locale'=>app()->getLocale()])) : url()->current();
         $socialImage = trim($__env->yieldContent('og_image')) ?: asset('assets/img/rest_logo.png');
     @endphp
     <title>{{ $pageTitle }} | Rest Developments</title>
     <meta name="description" content="{{ $pageDescription }}">
     <link rel="canonical" href="{{ $canonical }}">
-    <meta property="og:type" content="website">
+    @if($publicRoute)
+        @foreach(config('app.available_locales', ['en']) as $alternateLocale)
+            <link rel="alternate" hreflang="{{ $alternateLocale }}" href="{{ route($pageRoute, array_merge($routeParameters, ['locale'=>$alternateLocale])) }}">
+        @endforeach
+    @endif
+    <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:site_name" content="Rest Developments">
     <meta property="og:title" content="{{ $pageTitle }} | Rest Developments">
     <meta property="og:description" content="{{ $pageDescription }}">

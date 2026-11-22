@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ProjectPublicController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SitemapController;
 
 // Admin
 use App\Http\Controllers\DashboardController;
@@ -30,6 +31,8 @@ use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\VacancyController;
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\TestimonialController;
+
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 /**
  * Redirect helpers (so /projects, /about and /blog always redirect to localized version)

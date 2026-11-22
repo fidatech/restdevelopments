@@ -1,5 +1,6 @@
 @extends('layouts.heritage')
 @section('title', $blog->t()?->title ?? __('Journal'))
+@section('og_type', 'article')
 @section('description', \Illuminate\Support\Str::limit(strip_tags($blog->t()?->content ?? ''), 155))
 @section('og_image', $blog->thumb_large ? asset('storage/'.$blog->thumb_large) : '')
 @section('content')

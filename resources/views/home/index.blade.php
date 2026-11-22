@@ -11,8 +11,12 @@
             @php
                 $tr = $slide?->translation();
                 $headline = $tr?->headline ?: __('Places for life. Built with purpose.');
+                if ($index === 0 && mb_strlen($headline) > 70) $headline = __('Places for life. Built with purpose.');
                 $summary = $tr?->subheadline ?: __('Thoughtful residential and mixed-use developments shaped around the way people live.');
                 $buttonUrl = $tr?->button_url ?: route('projects.index', ['locale'=>app()->getLocale()]);
+                $buttonPath = trim((string) parse_url($buttonUrl, PHP_URL_PATH), '/');
+                if ($buttonPath === 'contacts' || str_ends_with($buttonPath, '/contacts') || $buttonPath === 'contact' || str_ends_with($buttonPath, '/contact')) $buttonUrl = route('contact', ['locale'=>app()->getLocale()]);
+                elseif ($buttonPath === 'projects' || str_ends_with($buttonPath, '/projects')) $buttonUrl = route('projects.index', ['locale'=>app()->getLocale()]);
                 $buttonText = $tr?->button_text ?: __('Explore our projects');
                 $desktop = $slide?->image ? asset('storage/'.$slide->image) : null;
                 $mobile = $slide?->image_mobile ? asset('storage/'.$slide->image_mobile) : $desktop;
@@ -58,7 +62,7 @@
                 <div class="hero-control-actions">
                     <button type="button" data-hero-prev aria-label="{{ __('Previous slide') }}">←</button>
                     <button type="button" data-hero-next aria-label="{{ __('Next slide') }}">→</button>
-                    <button type="button" data-hero-play aria-label="{{ __('Pause slideshow') }}" aria-pressed="false">Ⅱ</button>
+                    <button type="button" data-hero-play data-pause-label="{{ __('Pause slideshow') }}" data-play-label="{{ __('Play slideshow') }}" aria-label="{{ __('Pause slideshow') }}" aria-pressed="false"></button>
                 </div>
             </div>
         </div>

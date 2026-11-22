@@ -49,7 +49,7 @@ try {
             $tail = file_get_contents($log, false, null, max(0, filesize($log) - 65536));
             preg_match_all('/^\\[20[^\\n]+\\] [^\\n]*ERROR: [^\\n]+/m', (string) $tail, $matches);
             echo 'Recent error: '.substr((string) (end($matches[0]) ?: ''), 0, 500).PHP_EOL;
-            $compiled = Illuminate\\Support\\Facades\\Blade::compileString(file_get_contents($stagedViews.'/home/index.blade.php'));
+            $compiled = Illuminate\Support\Facades\Blade::compileString(file_get_contents($stagedViews.'/home/index.blade.php'));
             foreach (array_slice(explode(PHP_EOL, $compiled), 0, 12) as $lineNumber => $line) echo 'Blade '.($lineNumber + 1).': '.$line.PHP_EOL;
         }
     }

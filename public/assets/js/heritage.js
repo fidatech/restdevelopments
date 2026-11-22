@@ -38,8 +38,8 @@
     const setPaused = value => {
       paused = value;
       play.setAttribute('aria-pressed', String(value));
-      play.setAttribute('aria-label', value ? 'Play slideshow' : 'Pause slideshow');
-      play.textContent = value ? '▶' : 'Ⅱ';
+      play.setAttribute('aria-label', value ? play.dataset.playLabel : play.dataset.pauseLabel);
+      play.classList.toggle('is-paused', value);
     };
     setPaused(paused);
     carousel.querySelector('[data-hero-prev]')?.addEventListener('click', () => { setPaused(true); show(current - 1); });

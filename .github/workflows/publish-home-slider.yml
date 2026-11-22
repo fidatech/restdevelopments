@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
-          ref: aef5d7a212cfef79413571f1236be769928e9bd9
+          ref: 9b095bb1b5bbca03889566bebda786f4a14e306a
           persist-credentials: false
       - name: Verify server and replace the welcome layout
         env:
@@ -37,19 +37,19 @@ jobs:
               umask 077
               target=/home/restdevelopments/public_html/resources/views/home/sections/slider.blade.php
               current=$(git hash-object -- "$target")
-              if [ "$current" = "485791a8969cb135735a8ae214a30d98644ba52d" ]; then
+              if [ "$current" = "ea597bf2f9f4c53fd711167e82ab04d682dc9e2c" ]; then
                 echo "Homepage slider is already deployed"
                 exit 0
               fi
-              if [ "$current" != "1397c2e9c369a828432fc12f5f954c2b5365d56f" ]; then
-                echo "Live layout differs from the imported baseline. No files replaced."
+              if [ "$current" != "3f67caf0d435ce04157b69d60e28b2a0ca91cb70" ]; then
+                echo "Live slider differs from the imported baseline. No files replaced."
                 exit 1
               fi
               backup=$(mktemp -d "$HOME/restdevelopments-slider-backup.XXXXXXXX")
               cp -p -- "$target" "$backup/slider.blade.php"
               incoming=$(mktemp "$(dirname "$target")/.slider-view.XXXXXXXX")
               cat > "$incoming"
-              test "$(git hash-object --no-filters "$incoming")" = "485791a8969cb135735a8ae214a30d98644ba52d"
+              test "$(git hash-object --no-filters "$incoming")" = "ea597bf2f9f4c53fd711167e82ab04d682dc9e2c"
               chmod --reference="$target" "$incoming"
               test "$(git hash-object -- "$target")" = "$current"
               mv -T -- "$incoming" "$target"

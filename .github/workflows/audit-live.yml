@@ -24,4 +24,6 @@ jobs:
             echo "$mode"
             jq -r '.categories | [.performance.score, .accessibility.score, ."best-practices".score, .seo.score] | map(. * 100 | round) | @tsv' "/tmp/lighthouse-$mode.json"
             jq -r '.audits | [.["first-contentful-paint"].displayValue, .["largest-contentful-paint"].displayValue, .["total-blocking-time"].displayValue, .["cumulative-layout-shift"].displayValue] | @tsv' "/tmp/lighthouse-$mode.json"
+            echo "Weighted findings for $mode"
+            jq -r '. as $r | [.categories.performance.auditRefs[], .categories.accessibility.auditRefs[]] | unique_by(.id) | .[] | select(.weight > 0) | . as $ref | $r.audits[$ref.id] | select(.score != null and .score < 1) | [.id, .title, (.score | tostring), (.displayValue // ""), ([.details.items[]?.node?.selector] | unique | join(", "))] | @tsv' "/tmp/lighthouse-$mode.json"
           done

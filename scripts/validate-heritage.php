@@ -13,7 +13,7 @@ $kernel = $app->make(Kernel::class);
 $request = Request::create('https://restdevelopments.com'.$uri, 'GET');
 $app->instance('request', $request);
 $kernel->bootstrap();
-$finder = $app->make('view.finder');
+$finder = $app->make('view')->getFinder();
 $finder->setPaths([$stagedViews, $root.'/resources/views']);
 $finder->flush();
 echo 'Template: '.$finder->find('home.index').PHP_EOL;

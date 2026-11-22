@@ -249,8 +249,9 @@
 
         <style>
             #socialRedirectModal .modal-dialog { max-width: 470px; margin-inline: auto; padding-inline: 12px; }
-            .rest-welcome {
+            #socialRedirectModal .rest-welcome {
                 border: 0;
+                background: #fff !important;
                 border-radius: 16px;
                 overflow: hidden;
                 background: #fff;
@@ -282,7 +283,7 @@
                 line-height: 1;
             }
             .rest-welcome__close:hover { background: rgba(255, 255, 255, .16); }
-            .rest-welcome__body { padding: clamp(18px, 5vw, 28px); }
+            #socialRedirectModal .rest-welcome__body { padding: clamp(18px, 5vw, 28px); background: #fff !important; }
             .rest-welcome__primary {
                 display: flex;
                 gap: 10px;
@@ -324,6 +325,7 @@
             }
             .rest-welcome__links a:hover { color: #fff; filter: brightness(.88); }
             .rest-welcome__links i { color: #fff; font-size: 1rem; }
+            .rest-welcome__links a:last-child { grid-column: 1 / -1; justify-self: center; width: calc(50% - 5px); }
             .rest-welcome__facebook { background: #1877F2; }
             .rest-welcome__instagram { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
             .rest-welcome__youtube { background: #FF0000; }

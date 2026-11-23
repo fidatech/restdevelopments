@@ -101,7 +101,6 @@ $pages = [
     'amenities' => '/admin/amenities',
     'blog-categories' => '/admin/blog-categories',
     'blogs' => '/admin/blogs',
-    'blog-create' => '/admin/blogs/create',
     'blog-edit' => $blog ? "/admin/blogs/$blog/edit" : null,
     'why-us' => '/admin/why-us',
     'why-items' => '/admin/why-us/items',

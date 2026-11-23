@@ -50,6 +50,9 @@
     {{-- Icons that the page scripts still write as Font Awesome classes --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.8/dist/sweetalert2.min.css">
+    {{-- The page scripts of the panel use jQuery and SweetAlert2 --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @yield('vendor-style')
     @yield('page-style')
     @yield('styles')
@@ -163,9 +166,6 @@
 
 <script>window.ERP_TEXT = {"cancel":"Cancel","confirmOk":"Yes","confirmTitle":"Are you sure?","noResults":"No results","addNew":"New","failed":"Something went wrong. Please try again."};</script>
 <script src="{{ $ui('js/app.js') }}" defer></script>
-{{-- The page scripts of the panel use jQuery, DataTables and SweetAlert2 --}}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3UQhB+fZJ9I3Y6FU3QnYAaqUcJaV8NLtMTpzzG4=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Bootstrap 5 style calls of the page scripts, served by the template's own modals and tabs
     window.bootstrap = window.bootstrap || {

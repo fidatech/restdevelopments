@@ -57,7 +57,7 @@
     @yield('page-style')
     @yield('styles')
 </head>
-<body>
+<body data-no-export>
 <div class="app-wrapper">
     <aside class="app-sidebar" id="appSidebar" aria-label="Menu">
         <div class="sidebar-brand is-stacked">

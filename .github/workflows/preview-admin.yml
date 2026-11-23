@@ -1,5 +1,5 @@
 name: Preview admin panel on the server
-# rerun 2
+# rerun 3
 on:
   push:
     branches: [redesign/rest-signature]

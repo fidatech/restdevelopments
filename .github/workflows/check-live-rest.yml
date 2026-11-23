@@ -26,14 +26,15 @@ jobs:
           import { chromium } from 'playwright';
           const b = await chromium.launch();
           const run = async (name, w, h, url, popup) => {
-            const ctx = await b.newContext({ viewport: { width: w, height: h } });
+            const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: w > 500 ? 0.5 : 1 });
             const p = await ctx.newPage();
             const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => m.type() === 'error' && errs.push(m.text()));
             if (!popup) await p.addInitScript(() => sessionStorage.setItem('restWelcomeShown', '1'));
             await p.goto(url, { waitUntil: 'networkidle' });
             if (!popup) { for (let y = 0; y < 12000; y += 700) { await p.evaluate(v => scrollTo(0, v), y); await p.waitForTimeout(200); } await p.evaluate(() => scrollTo(0, 0)); }
             await p.waitForTimeout(1500);
-            await p.screenshot({ path: name + '.png', fullPage: !popup });
+            const buf = await p.screenshot({ type: 'jpeg', quality: 55, fullPage: !popup });
+            const b64 = buf.toString('base64'); for (let i = 0; i < b64.length; i += 8000) console.log('IMG ' + name + ' ' + b64.slice(i, i + 8000));
             console.log(name, JSON.stringify(errs));
             await ctx.close();
           };
@@ -41,10 +42,7 @@ jobs:
           await run('home-popup', 1440, 900, 'https://restdevelopments.com/en/', true);
           await run('home-mobile', 390, 844, 'https://restdevelopments.com/en/', false);
           await run('projects-desktop', 1440, 900, 'https://restdevelopments.com/en/projects', false);
+          await run('project-desktop', 1440, 900, 'https://restdevelopments.com/en/projects/business-office-spaces-at-rest-complex-termiz', false);
           await b.close();
           JS
           node shoot.mjs
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: live-screenshots
-          path: shots/*.png

@@ -5,24 +5,17 @@
 @php
     $locale = app()->getLocale();
     $heroSlides = $sliders->isNotEmpty() ? $sliders : collect([null]);
-    $projects = $featuredProjects->isNotEmpty() ? $featuredProjects : $ongoingProjects;
-    $lead = $projects->first();
-    $others = $projects->slice(1, 2);
+    $launches = ($featuredProjects->isNotEmpty() ? $featuredProjects : $ongoingProjects)->take(3)->values();
+    $exploreProjects = \Illuminate\Support\Facades\Cache::remember("site.projects.explore.$locale", 300, fn () => \App\Models\Project::active()->with('translations')->orderBy('order')->orderByDesc('created_at')->take(6)->get());
+    $projectCount = \Illuminate\Support\Facades\Cache::remember('site.projects.count', 300, fn () => \App\Models\Project::active()->count());
     $aboutTr = $about?->t();
+    $stateLabel = fn ($state) => $state === 'ongoing' ? __('Under construction') : ($state ? __(ucfirst($state)) : null);
 @endphp
 
 {{-- Hero --}}
-<section class="hero" aria-roledescription="carousel" aria-label="{{ __('Featured developments') }}" data-hero>
+<section class="hero" aria-label="{{ __('Featured developments') }}" data-hero>
     @foreach($heroSlides as $index => $slide)
         @php
-            $tr = $slide?->translation();
-            $headline = $tr?->headline ?: __('Places for life. Built with purpose.');
-            $summary = $tr?->subheadline ?: __('Residential and mixed-use developments in Kabul and Termiz, planned around the way families live.');
-            $buttonUrl = $tr?->button_url ?: route('projects.index', ['locale' => $locale]);
-            $buttonPath = trim((string) parse_url($buttonUrl, PHP_URL_PATH), '/');
-            if (preg_match('#(^|/)contacts?$#', $buttonPath)) $buttonUrl = route('contact', ['locale' => $locale]);
-            elseif (preg_match('#(^|/)projects$#', $buttonPath)) $buttonUrl = route('projects.index', ['locale' => $locale]);
-            $buttonText = $tr?->button_text ?: __('Explore our projects');
             $desktop = $slide?->image ? asset('storage/'.$slide->image) : asset('assets/img/brand/towers.webp');
             $mobile = $slide?->image_mobile ? asset('storage/'.$slide->image_mobile) : $desktop;
             if ($slide?->image) {
@@ -32,138 +25,194 @@
                 if (is_file(public_path($mobileFile))) $mobile = asset($mobileFile);
             }
         @endphp
-        <article class="hero-slide{{ $index === 0 ? ' is-active' : '' }}" data-hero-slide aria-roledescription="slide" aria-label="{{ $index + 1 }} / {{ $heroSlides->count() }}" @if($index > 0) aria-hidden="true" @endif>
-            <picture class="hero-media">
+        <div class="hero-slide{{ $index === 0 ? ' is-active' : '' }}" data-hero-slide aria-hidden="true">
+            <picture>
                 <source media="(max-width: 720px)" @if($index === 0) srcset="{{ $mobile }}" @else data-srcset="{{ $mobile }}" @endif>
                 <img @if($index === 0) src="{{ $desktop }}" fetchpriority="high" @else data-src="{{ $desktop }}" @endif width="1920" height="1080" alt="" decoding="async">
             </picture>
-            <div class="wrap hero-copy">
-                <span class="kicker">{{ __('Kabul, Termiz and Dubai') }}</span>
-                @php($long = mb_strlen($headline) > 46 ? ' is-long' : '')
-                @if($index === 0)<h1 class="hero-title{{ $long }}">{{ $headline }}</h1>@else<h2 class="hero-title{{ $long }}">{{ $headline }}</h2>@endif
-                <p class="lead">{{ $summary }}</p>
-                <div class="hero-actions">
-                    <a class="btn btn--gold" href="{{ $buttonUrl }}">{{ $buttonText }}</a>
-                    <a class="btn btn--ghost" href="{{ route('about', ['locale' => $locale]) }}">{{ __('Our story') }}</a>
-                </div>
-            </div>
-        </article>
+        </div>
     @endforeach
 
-
-    @if($heroSlides->count() > 1)
-        <div class="hero-index">
-            <div class="wrap">
-                <div class="hero-tabs" role="group" aria-label="{{ __('Choose a slide') }}">
-                    @foreach($heroSlides as $index => $slide)
-                        <button class="hero-tab" type="button" data-hero-to="{{ $index }}" @if($index === 0) aria-current="true" @endif>
-                            <b>{{ sprintf('%02d', $index + 1) }}</b>
-                            <span>{{ $slide?->translation()?->headline ?: __('Slide').' '.($index + 1) }}</span>
-                        </button>
-                    @endforeach
-                </div>
-                <button class="hero-pause" type="button" data-hero-pause data-pause-label="{{ __('Pause slideshow') }}" data-play-label="{{ __('Play slideshow') }}" aria-label="{{ __('Pause slideshow') }}" aria-pressed="false"></button>
+    <div class="hero-content">
+        <div class="wrap hero-row">
+            <div class="hero-text">
+                @foreach($heroSlides as $index => $slide)
+                    @php
+                        $tr = $slide?->translation();
+                        $headline = $tr?->headline ?: __('Live above the ordinary.');
+                        $buttonUrl = $tr?->button_url ?: route('projects.index', ['locale' => $locale]);
+                        $buttonPath = trim((string) parse_url($buttonUrl, PHP_URL_PATH), '/');
+                        if (preg_match('#(^|/)contacts?$#', $buttonPath)) $buttonUrl = route('contact', ['locale' => $locale]);
+                        elseif (preg_match('#(^|/)projects$#', $buttonPath)) $buttonUrl = route('projects.index', ['locale' => $locale]);
+                    @endphp
+                    <div class="hero-copy{{ $index === 0 ? ' is-active' : '' }}" data-hero-copy>
+                        <span class="eyebrow">{{ __('Rest Developments') }}</span>
+                        @if($index === 0)
+                            <h1 class="hero-title{{ mb_strlen($headline) > 34 ? ' is-long' : '' }}">{{ $headline }}</h1>
+                        @else
+                            <p class="hero-title{{ mb_strlen($headline) > 34 ? ' is-long' : '' }}">{{ $headline }}</p>
+                        @endif
+                        @if($tr?->button_text)<p style="margin:22px 0 0"><a class="text-link" href="{{ $buttonUrl }}">{{ $tr->button_text }}</a></p>@endif
+                    </div>
+                @endforeach
+            </div>
+            <div class="hero-side">
+                <p>{{ $heroSlides->first()?->translation()?->subheadline ?: __('10+ years of trusted real estate development. From residences to retail, we deliver quality, on time.') }}</p>
+                @if($heroSlides->count() > 1)
+                    <div class="hero-dots" role="group" aria-label="{{ __('Choose a slide') }}">
+                        @foreach($heroSlides as $index => $slide)
+                            <button class="hero-dot" type="button" data-hero-to="{{ $index }}" aria-label="{{ __('Show slide') }} {{ $index + 1 }}" @if($index === 0) aria-current="true" @endif></button>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </div>
-    @endif
-</section>
-
-{{-- Who we are --}}
-<section class="section" id="about-sec">
-    <div class="wrap">
-        <div class="statement">
-            <div class="statement-side"><span class="kicker">{{ __('About Rest Developments') }}</span></div>
-            <div>
-                <p class="statement-text{{ mb_strlen($aboutTr?->subtitle ?? '') > 160 ? ' is-long' : '' }}">{{ $aboutTr?->subtitle ?: __('We build homes and neighbourhoods where architecture, community and everyday life sit comfortably together.') }}</p>
-                <a class="link" href="{{ route('about', ['locale' => $locale]) }}">{{ __('Read our story') }}</a>
-            </div>
-        </div>
-        <div class="places">
-            <div class="place"><h3>Kabul</h3><p>{{ __('Afghanistan') }}</p></div>
-            <div class="place"><h3>Termiz</h3><p>{{ __('Uzbekistan') }}</p></div>
-            <div class="place"><h3>Dubai</h3><p>{{ __('United Arab Emirates') }}</p></div>
+        <div class="wrap">
+            <form class="search-bar" method="get" action="{{ route('projects.index', ['locale' => $locale]) }}" role="search" aria-label="{{ __('Find a property') }}">
+                <label>{{ __('City') }}
+                    <select name="location">
+                        <option value="">{{ __('All cities') }}</option>
+                        <option value="Kabul">{{ __('Kabul') }}</option>
+                        <option value="Termiz">{{ __('Termiz') }}</option>
+                    </select>
+                </label>
+                <label>{{ __('Status') }}
+                    <select name="state">
+                        <option value="">{{ __('Any status') }}</option>
+                        <option value="ongoing">{{ __('Under construction') }}</option>
+                        <option value="completed">{{ __('Completed') }}</option>
+                    </select>
+                </label>
+                <label>{{ __('Keyword') }}
+                    <input type="search" name="q" placeholder="{{ __('Apartment, office, retail…') }}">
+                </label>
+                <button type="submit">{{ __('Show results') }} @include('partials.arrow')</button>
+            </form>
         </div>
     </div>
 </section>
 
-{{-- Projects --}}
-@if($lead)
+{{-- New launches --}}
+@if($launches->isNotEmpty())
+<section class="section" data-launches>
+    <div class="wrap">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">{{ __('New launches') }}</span>
+                <h2>{{ __('The latest from Rest') }}</h2>
+            </div>
+            @if($launches->count() > 1)
+                <div class="launch-controls">
+                    <span class="launch-count" data-launch-count aria-live="polite">01 / {{ sprintf('%02d', $launches->count()) }}</span>
+                    <button class="round-btn" type="button" data-launch-prev aria-label="{{ __('Previous project') }}"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M11 3L5 9l6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+                    <button class="round-btn round-btn--dark" type="button" data-launch-next aria-label="{{ __('Next project') }}"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M7 3l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+                </div>
+            @endif
+        </div>
+        @foreach($launches as $i => $project)
+            @php
+                $tr = $project->t();
+                $url = route('projects.show', ['locale' => $locale, 'slug' => $project->slug]);
+            @endphp
+            <article class="launch{{ $i === 0 ? ' is-active' : '' }}" data-launch>
+                <a class="launch-media" href="{{ $url }}" tabindex="-1" aria-hidden="true">@if($project->image)<img src="{{ asset('storage/'.$project->image) }}" alt="" loading="lazy" decoding="async" width="1100" height="600">@endif</a>
+                <div>
+                    @if($project->location)<p class="launch-place">{{ $project->location }}</p>@endif
+                    <h3>{{ $tr?->title }}</h3>
+                    <p class="lead">{{ \Illuminate\Support\Str::limit(trim(strip_tags($tr?->description ?? '')), 220) }}</p>
+                    <dl class="launch-facts">
+                        @if($stateLabel($project->state))<div><dt>{{ __('Status') }}</dt><dd>{{ $stateLabel($project->state) }}</dd></div>@endif
+                        @if($project->area)<div><dt>{{ __('Area') }}</dt><dd>{{ number_format((float) $project->area) }} m²</dd></div>@endif
+                        @if($project->price_starts_from)<div><dt>{{ __('Prices from') }}</dt><dd>{{ $project->price_starts_from }}</dd></div>@endif
+                        @if($project->beds)<div><dt>{{ __('Bedrooms') }}</dt><dd>{{ $project->beds }}</dd></div>@endif
+                    </dl>
+                    <div class="actions">
+                        <a class="btn btn--green" href="{{ route('contact', ['locale' => $locale]) }}">{{ __('Register interest') }}</a>
+                        <a class="btn btn--line" href="{{ $url }}">{{ __('Explore project') }}</a>
+                    </div>
+                </div>
+            </article>
+        @endforeach
+    </div>
+</section>
+@endif
+
+{{-- Projects and destinations --}}
+@if($exploreProjects->isNotEmpty())
 <section class="section section--mist">
     <div class="wrap">
         <div class="section-head">
-            <div><span class="kicker">{{ __('Our projects') }}</span><h2>{{ __('Places to discover') }}</h2></div>
-            <a class="link" href="{{ route('projects.index', ['locale' => $locale]) }}">{{ __('See all projects') }}</a>
-        </div>
-        @php($leadTr = $lead->t())
-        <article class="project project-feature">
-            <div class="project-media">
-                @if($lead->image)<img src="{{ asset('storage/'.$lead->image) }}" alt="" loading="lazy" decoding="async" width="1000" height="800">@endif
-                @if($lead->state)<span class="project-status {{ $lead->state === 'ongoing' ? 'is-ongoing' : '' }}">{{ $lead->state === 'ongoing' ? __('Under construction') : __(ucfirst($lead->state)) }}</span>@endif
-            </div>
             <div>
-                @if($lead->location)<span class="project-location">{{ $lead->location }}</span>@endif
-                <h3><a href="{{ route('projects.show', ['locale' => $locale, 'slug' => $lead->slug]) }}">{{ $leadTr?->title }}</a></h3>
-                <p>{{ \Illuminate\Support\Str::limit(strip_tags($leadTr?->description ?? ''), 260) }}</p>
-                <span class="btn" aria-hidden="true">{{ __('View project') }}</span>
+                <span class="eyebrow">{{ __('Our projects') }}</span>
+                <h2>{{ __('Places to live, work and gather') }}</h2>
+            </div>
+            <a class="text-link" href="{{ route('projects.index', ['locale' => $locale]) }}">{{ __('View all projects') }} @include('partials.arrow')</a>
+        </div>
+        <div class="tiles">
+            @foreach($exploreProjects as $project)
+                <a class="tile" href="{{ route('projects.show', ['locale' => $locale, 'slug' => $project->slug]) }}">
+                    @if($project->image)<img src="{{ asset('storage/'.$project->image) }}" alt="" loading="lazy" decoding="async" width="800" height="440">@endif
+                    <span class="tile-label"><span>@if($project->location)<small>{{ $project->location }}</small>@endif<strong>{{ $project->t()?->title }}</strong></span>@include('partials.arrow')</span>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- About and leadership --}}
+<section class="section">
+    <div class="wrap">
+        <article class="feature">
+            <div class="feature-media"><img src="{{ $about?->image_left ? asset('storage/'.$about->image_left) : asset('assets/img/brand/towers-night.webp') }}" alt="{{ __('Rest Developments project') }}" loading="lazy" decoding="async" width="1000" height="620"></div>
+            <div>
+                <span class="eyebrow">{{ __('About Rest') }}</span>
+                <h2>{{ $aboutTr?->title ?: __('Building places for people') }}</h2>
+                <p class="lead">{{ $aboutTr?->subtitle ?: __('Rest Developments delivers modern residential and mixed-use projects across Afghanistan and Uzbekistan, with a focus on quality construction, thoughtful design and long-term value.') }}</p>
+                <div class="actions" style="margin-top:32px"><a class="btn btn--line" href="{{ route('about', ['locale' => $locale]) }}">{{ __('Our story') }}</a></div>
             </div>
         </article>
-        @if($others->isNotEmpty())
-            <div class="project-grid project-grid--two">
-                @foreach($others as $project)@include('partials.heritage-project-card')@endforeach
+        @if($aboutTr?->about_text)
+        <article class="feature feature--flip">
+            <div>
+                <span class="eyebrow">{{ __('A message from our CEO') }}</span>
+                <blockquote>“{{ $aboutTr->about_text }}”</blockquote>
+                <cite>{{ $aboutTr->circle_text ?: 'Rest Developments' }}</cite>
+                <a class="btn btn--line" href="{{ route('team.index', ['locale' => $locale]) }}">{{ __('Meet our people') }}</a>
             </div>
+            <div class="feature-media"><img src="{{ asset('assets/img/brand/courtyard.webp') }}" alt="{{ __('Courtyard at Rest Complex') }}" loading="lazy" decoding="async" width="920" height="496"></div>
+        </article>
         @endif
     </div>
 </section>
-@endif
 
-{{-- Leadership message --}}
-@if($aboutTr?->about_text)
-<section class="section section--green on-dark">
-    <div class="wrap">
-        <figure class="quote" style="margin:0">
-            <span class="quote-mark" aria-hidden="true">“</span>
-            <div>
-                <span class="kicker">{{ __('A message from our CEO') }}</span>
-                <blockquote>{{ $aboutTr->about_text }}</blockquote>
-                <figcaption>{{ $aboutTr->circle_text ?: 'Rest Developments' }}</figcaption>
-            </div>
-        </figure>
-    </div>
-</section>
-@endif
-
-{{-- Life at Rest --}}
-<section class="section">
-    <div class="wrap overlap">
-        <div class="overlap-media">
-            <img src="{{ asset('assets/img/brand/interior.webp') }}" alt="{{ __('Living room in a Rest Developments apartment') }}" loading="lazy" decoding="async" width="1280" height="880">
-        </div>
-        <div class="overlap-panel">
-            <span class="kicker">{{ __('Life at Rest') }}</span>
-            <h2>{{ __('A home is more than its walls.') }}</h2>
-            <p class="lead">{{ __('Bright apartments, shared courtyards and the small details that make a building feel like home.') }}</p>
-            <a class="link" href="{{ route('projects.index', ['locale' => $locale]) }}">{{ __('Explore apartments') }}</a>
-        </div>
+{{-- Figures --}}
+<section class="section section--green on-dark" style="padding-block: clamp(72px, 8vw, 110px)">
+    <div class="wrap stats">
+        <div class="stat"><b>10+</b><p>{{ __('Years of real estate development') }}</p></div>
+        <div class="stat"><b>3</b><p>{{ __('Countries: Afghanistan, Uzbekistan and the UAE') }}</p></div>
+        <div class="stat"><b>{{ $projectCount }}</b><p>{{ __('Projects and destinations') }}</p></div>
+        <div class="stat stat--gold"><b>4</b><p>{{ __('Languages we serve you in') }}</p></div>
     </div>
 </section>
 
 {{-- News --}}
 @if($latestBlogs->isNotEmpty())
-<section class="section section--mist">
+<section class="section">
     <div class="wrap">
         <div class="section-head">
-            <div><span class="kicker">{{ __('News') }}</span><h2>{{ __('Latest from Rest') }}</h2></div>
-            <a class="link" href="{{ route('blog.index', ['locale' => $locale]) }}">{{ __('All news') }}</a>
+            <h2>{{ __('News') }}</h2>
+            <a class="text-link" href="{{ route('blog.index', ['locale' => $locale]) }}">{{ __('All news') }} @include('partials.arrow')</a>
         </div>
-        <div class="journal">
+        <div class="news-list">
             @foreach($latestBlogs->take(3) as $post)
-                <article class="journal-item">
+                <article class="news-item">
                     <time datetime="{{ $post->created_at?->toDateString() }}">{{ $post->created_at?->translatedFormat('d M Y') }}</time>
                     <div>
                         <h3><a href="{{ route('blog.show', ['locale' => $locale, 'slug' => $post->slug]) }}">{{ $post->t()?->title }}</a></h3>
-                        <p>{{ \Illuminate\Support\Str::limit(strip_tags($post->t()?->content ?? ''), 130) }}</p>
+                        <p>{{ \Illuminate\Support\Str::limit(trim(strip_tags($post->t()?->content ?? '')), 140) }}</p>
                     </div>
-                    <div class="journal-thumb">@if($post->thumb_large)<img src="{{ asset('storage/'.$post->thumb_large) }}" alt="" loading="lazy" decoding="async" width="400" height="267">@endif</div>
+                    <div class="news-thumb">@if($post->thumb_large)<img src="{{ asset('storage/'.$post->thumb_large) }}" alt="" loading="lazy" decoding="async" width="640" height="400">@endif</div>
                 </article>
             @endforeach
         </div>

@@ -19,20 +19,21 @@
         $socialImage = trim($__env->yieldContent('og_image')) ?: asset('assets/img/rest_logo.png');
         $asset = fn (string $path) => asset($path).'?v='.(@filemtime(public_path($path)) ?: '1');
         $navItems = [
-            ['home', __('Home')],
-            ['about', __('Company')],
             ['projects.index', __('Projects')],
-            ['latest-launches', __('Latest launches')],
+            ['latest-launches', __('New launches')],
+            ['about', __('About')],
             ['blog.index', __('News')],
             ['careers.index', __('Careers')],
             ['contact', __('Contact')],
         ];
+        $languageNames = ['en' => 'English', 'fa' => 'دری', 'ps' => 'پښتو', 'uz' => 'Oʻzbekcha'];
+        $whatsapp = 'https://api.whatsapp.com/send?phone=+93777578657&text=Hello%20Rest%20Developments';
         $socialLinks = [
-            ['facebook', 'Facebook', 'https://www.facebook.com/share/1Bc9FitgQD/?mibextid=wwXIfr', __('Follow')],
-            ['instagram', 'Instagram', 'https://www.instagram.com/restdevelopments?igsh=MTBibzh5NHVnbTZnaw%3D%3D&utm_source=qr', __('Follow')],
-            ['youtube', 'YouTube', 'https://youtu.be/x4Fibo6XObs?si=PJWWInMGtG8Z6IPc', __('Watch')],
-            ['telegram', 'Telegram', 'https://t.me/rest_developments', __('Join')],
-            ['whatsapp', 'WhatsApp', 'https://api.whatsapp.com/send?phone=+93777578657&text=Hello%20Rest%20Developments', __('Chat with our sales team')],
+            ['facebook', 'Facebook', 'https://www.facebook.com/share/1Bc9FitgQD/?mibextid=wwXIfr'],
+            ['instagram', 'Instagram', 'https://www.instagram.com/restdevelopments?igsh=MTBibzh5NHVnbTZnaw%3D%3D&utm_source=qr'],
+            ['youtube', 'YouTube', 'https://youtu.be/x4Fibo6XObs?si=PJWWInMGtG8Z6IPc'],
+            ['telegram', 'Telegram', 'https://t.me/rest_developments'],
+            ['whatsapp', 'WhatsApp', $whatsapp],
         ];
     @endphp
     <title>{{ $pageTitle }} | Rest Developments</title>
@@ -51,14 +52,11 @@
     <meta property="og:image" content="{{ $socialImage }}">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="{{ asset('assets/img/favicons/favicon-32x32.png') }}" sizes="32x32">
-    <link rel="preload" href="{{ asset('assets/fonts/cardo-regular.woff') }}" as="font" type="font/woff" crossorigin>
-    <link rel="preload" href="{{ asset('assets/fonts/dmsans-var.woff') }}" as="font" type="font/woff" crossorigin>
-    @if($isRtl)
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300..700&display=swap">
-    @endif
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600{{ $isRtl ? '&family=Vazirmatn:wght@300;400;500;600' : '' }}&display=swap">
     <link rel="stylesheet" href="{{ $asset('assets/css/heritage.css') }}">
+    @stack('head')
     <script type="application/ld+json">{!! json_encode(['@context'=>'https://schema.org','@type'=>'Organization','@id'=>url('/').'#organization','name'=>'Rest Developments','url'=>url('/'),'logo'=>asset('assets/img/rest_logo.png'),'description'=>'Residential and mixed-use real estate development in Afghanistan and Uzbekistan.','areaServed'=>[['@type'=>'Country','name'=>'Afghanistan'],['@type'=>'Country','name'=>'Uzbekistan']],'sameAs'=>array_map(fn ($s) => $s[2], array_slice($socialLinks, 0, 4))], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
     @stack('schema')
 </head>
@@ -67,22 +65,24 @@
 
 <header class="site-header" data-header>
     <div class="wrap header-inner">
-        <a class="brand" href="{{ route('home', ['locale' => $locale]) }}" aria-label="Rest Developments — {{ __('Home') }}">@include('partials.brand-logo', ['variant' => 'green'])</a>
-        <button class="menu-toggle" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="{{ __('Open menu') }}" data-open-label="{{ __('Open menu') }}" data-close-label="{{ __('Close menu') }}"><span></span><span></span><span></span></button>
+        <a class="brand" href="{{ route('home', ['locale' => $locale]) }}" aria-label="Rest Developments, {{ __('Home') }}">@include('partials.brand-logo')</a>
         <nav class="main-nav" id="main-nav" aria-label="{{ __('Main navigation') }}">
             @foreach($navItems as [$routeName, $label])
-                @continue($routeName === 'contact')
-                <a href="{{ route($routeName, ['locale' => $locale]) }}" @if(request()->routeIs($routeName) || ($routeName !== 'home' && request()->routeIs(str_replace('.index', '', $routeName).'.*'))) aria-current="page" @endif>{{ $label }}</a>
+                <a href="{{ route($routeName, ['locale' => $locale]) }}" @if(request()->routeIs($routeName) || request()->routeIs(str_replace('.index', '', $routeName).'.*')) aria-current="page" @endif>{{ $label }}</a>
             @endforeach
-            <div class="header-tools">
-                <div class="languages" role="group" aria-label="{{ __('Language') }}">
+        </nav>
+        <div class="header-tools">
+            <details class="lang">
+                <summary aria-label="{{ __('Language') }}">{{ strtoupper($locale) }} <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></summary>
+                <div class="lang-menu">
                     @foreach(config('app.available_locales', ['en','ps','fa','uz']) as $language)
-                        <a href="{{ route('lang.switch', ['locale' => $language]) }}" lang="{{ $language }}" hreflang="{{ $language }}" @if($locale === $language) aria-current="true" @endif>{{ strtoupper($language) }}</a>
+                        <a href="{{ route('lang.switch', ['locale' => $language]) }}" lang="{{ $language }}" hreflang="{{ $language }}" @if($locale === $language) aria-current="true" @endif>{{ $languageNames[$language] ?? strtoupper($language) }}</a>
                     @endforeach
                 </div>
-                <a class="btn header-cta" href="{{ route('contact', ['locale' => $locale]) }}">{{ __('Contact us') }}</a>
-            </div>
-        </nav>
+            </details>
+            <a class="btn header-cta" href="{{ route('contact', ['locale' => $locale]) }}">{{ __('Get in touch') }}</a>
+            <button class="menu-toggle" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="{{ __('Open menu') }}" data-open-label="{{ __('Open menu') }}" data-close-label="{{ __('Close menu') }}"><span></span><span></span><span></span></button>
+        </div>
     </div>
 </header>
 
@@ -91,30 +91,30 @@
 <footer class="site-footer">
     <div class="wrap footer-top">
         <div class="footer-brand">
-            @include('partials.brand-logo', ['variant' => 'light'])
-            <p>{{ __('Residential and mixed-use developments in Afghanistan and Uzbekistan, planned around the way families live.') }}</p>
+            @include('partials.brand-logo')
+            <p>{{ __('Residential and mixed-use real estate in Afghanistan and Uzbekistan.') }}</p>
             <div class="socials">
                 @foreach($socialLinks as [$key, $name, $url])
                     <a class="is-{{ $key }}" href="{{ $url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $name }}">@include('partials.social-icon', ['name' => $key])</a>
                 @endforeach
             </div>
         </div>
+        <nav aria-label="{{ __('Explore') }}">
+            <h2>{{ __('Explore') }}</h2>
+            <a href="{{ route('projects.index', ['locale' => $locale]) }}">{{ __('All projects') }}</a>
+            <a href="{{ route('latest-launches', ['locale' => $locale]) }}">{{ __('New launches') }}</a>
+            <a href="{{ route('projects.index', ['locale' => $locale, 'state' => 'ongoing']) }}">{{ __('Under construction') }}</a>
+            <a href="{{ route('projects.index', ['locale' => $locale, 'state' => 'completed']) }}">{{ __('Completed') }}</a>
+        </nav>
         <nav aria-label="{{ __('Company') }}">
             <h2>{{ __('Company') }}</h2>
             <a href="{{ route('about', ['locale' => $locale]) }}">{{ __('About us') }}</a>
             <a href="{{ route('team.index', ['locale' => $locale]) }}">{{ __('Our people') }}</a>
-            <a href="{{ route('careers.index', ['locale' => $locale]) }}">{{ __('Careers') }}</a>
             <a href="{{ route('blog.index', ['locale' => $locale]) }}">{{ __('News') }}</a>
-        </nav>
-        <nav aria-label="{{ __('Projects') }}">
-            <h2>{{ __('Projects') }}</h2>
-            <a href="{{ route('projects.index', ['locale' => $locale]) }}">{{ __('All projects') }}</a>
-            <a href="{{ route('projects.index', ['locale' => $locale, 'state' => 'ongoing']) }}">{{ __('Under construction') }}</a>
-            <a href="{{ route('projects.index', ['locale' => $locale, 'state' => 'completed']) }}">{{ __('Completed') }}</a>
-            <a href="{{ route('latest-launches', ['locale' => $locale]) }}">{{ __('Latest launches') }}</a>
+            <a href="{{ route('careers.index', ['locale' => $locale]) }}">{{ __('Careers') }}</a>
         </nav>
         <div class="footer-contact">
-            <h2>{{ __('Get in touch') }}</h2>
+            <h2>{{ __('Contact') }}</h2>
             <a href="tel:+93777578657" dir="ltr">+93 777 578 657</a>
             <a href="mailto:info@restdevelopments.com">info@restdevelopments.com</a>
             <address>Kabul, Afghanistan<br>Termiz, Uzbekistan<br>Dubai, United Arab Emirates</address>
@@ -130,27 +130,27 @@
 <div class="welcome" id="socialRedirectModal" hidden>
     <section class="welcome-panel" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="welcome-title" aria-describedby="welcome-text">
         <button class="welcome-close" type="button" data-welcome-dismiss aria-label="{{ __('Close') }}">
-            <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2 2l14 14M16 2L2 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         </button>
         <div class="welcome-visual">
-            <img src="{{ asset('assets/img/brand/welcome.webp') }}" alt="" width="760" height="1206" loading="lazy" decoding="async">
-            @include('partials.brand-logo', ['variant' => 'light'])
-            <p>{{ __('Places for life, built with purpose.') }}</p>
+            <img src="{{ asset('assets/img/brand/courtyard.webp') }}" alt="" width="920" height="496" loading="lazy" decoding="async">
+            @include('partials.brand-logo')
+            <p>{{ __('Live above the ordinary.') }}</p>
         </div>
         <div class="welcome-body">
             <h2 id="welcome-title">{{ __('Welcome to Rest Developments') }}</h2>
-            <p id="welcome-text">{{ __('Browse our projects on the website, or follow our latest news on social media.') }}</p>
-            <button class="btn welcome-enter" type="button" data-welcome-dismiss>
+            <p id="welcome-text">{{ __('Explore our projects on the website, or follow our latest news on social media.') }}</p>
+            <button class="btn btn--green welcome-enter" type="button" data-welcome-dismiss>
                 {{ __('Continue to website') }}
-                <svg viewBox="0 0 22 22" aria-hidden="true"><path d="M3 11h15M12 5l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg viewBox="0 0 22 22" aria-hidden="true"><path d="M3 11h15M12 5l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <div class="welcome-or">{{ __('or connect with us') }}</div>
             <div class="social-buttons">
-                @foreach($socialLinks as [$key, $name, $url, $action])
+                @foreach($socialLinks as [$key, $name, $url])
                     <a class="social-btn is-{{ $key }}" href="{{ $url }}" target="_blank" rel="noopener noreferrer">
                         @include('partials.social-icon', ['name' => $key])
                         <span>{{ $name }}</span>
-                        @if($key === 'whatsapp')<small>{{ $action }}</small>@endif
+                        @if($key === 'whatsapp')<small>{{ __('Chat with our sales team') }}</small>@endif
                     </a>
                 @endforeach
             </div>

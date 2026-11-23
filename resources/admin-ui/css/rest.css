@@ -122,3 +122,7 @@ table.dataTable td img { border-radius: 8px; max-height: 64px; width: auto; }
 .status-badge.open, .status-badge.active, .status-badge.published { background: rgba(var(--success-rgb), .13); color: #14805c; }
 .status-badge.closed, .status-badge.inactive { background: rgba(var(--danger-rgb), .11); color: #b02a37; }
 .status-badge.draft, .status-badge.pending { background: rgba(var(--warning-rgb), .16); color: #8a5d00; }
+/* the badges sit on the photo, not over all of it (Bootstrap 5 stretches every child of .ratio) */
+.slider-media.ratio > .ribbon { inset: auto; top: 10px; left: -32px; width: 140px; height: auto; }
+.slider-media.ratio > .chip { inset: auto; top: 10px; right: 10px; width: auto; height: auto; }
+.slider-media.ratio > .video-pill { inset: auto; left: 10px; bottom: 10px; width: auto; height: auto; }

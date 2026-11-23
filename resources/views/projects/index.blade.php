@@ -20,6 +20,12 @@
                     <option value="completed" @selected(request('state') === 'completed')>{{ __('Completed') }}</option>
                 </select>
             </label>
+            <label>{{ __('Bedrooms') }}
+                <select name="beds">
+                    <option value="">{{ __('Any') }}</option>
+                    @foreach(range(1, 5) as $b)<option value="{{ $b }}" @selected((int) request('beds') === $b)>{{ $b }}</option>@endforeach
+                </select>
+            </label>
             <button type="submit">{{ __('Show results') }}</button>
         </form>
         <div class="cards">

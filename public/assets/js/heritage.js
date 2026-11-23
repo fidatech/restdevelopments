@@ -5,7 +5,7 @@
   /* Header: transparent over the hero, white once the page scrolls */
   const header = document.querySelector('[data-header]');
   if (header) {
-    const onScroll = () => header.classList.toggle('is-solid', window.scrollY > 40);
+    const onScroll = () => { header.classList.toggle('is-solid', window.scrollY > 40); document.body.classList.toggle('past-hero', window.scrollY > 500); };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
   }
@@ -32,6 +32,98 @@
     if (toggle?.getAttribute('aria-expanded') === 'true') { setMenu(false); toggle.focus(); }
   });
 
+  /* Mega menus: hover on desktop, tap on touch and in the mobile menu */
+  const megaItems = [...document.querySelectorAll('.has-mega')];
+  const desktop = window.matchMedia('(min-width: 1181px)');
+  const setMega = (item, open) => {
+    megaItems.forEach(other => {
+      const on = other === item && open;
+      other.classList.toggle('is-open', on);
+      other.querySelector('.nav-trigger')?.setAttribute('aria-expanded', String(on));
+    });
+    if (desktop.matches) header?.classList.toggle('mega-open', open);
+  };
+  megaItems.forEach(item => {
+    let closeTimer;
+    item.querySelector('.nav-trigger')?.addEventListener('click', () => setMega(item, !item.classList.contains('is-open')));
+    item.addEventListener('mouseenter', () => { if (!desktop.matches) return; clearTimeout(closeTimer); setMega(item, true); });
+    item.addEventListener('mouseleave', () => { if (!desktop.matches) return; closeTimer = setTimeout(() => { if (item.classList.contains('is-open')) setMega(item, false); }, 160); });
+    item.addEventListener('focusout', e => { if (desktop.matches && !item.contains(e.relatedTarget)) setMega(item, false); });
+  });
+  document.addEventListener('click', e => { if (desktop.matches && !e.target.closest('.has-mega')) megaItems.forEach(i => i.classList.contains('is-open') && setMega(i, false)); });
+
+  /* Search overlay */
+  const search = document.getElementById('siteSearch');
+  const openSearch = () => { if (!search) return; search.hidden = false; document.body.classList.add('modal-open'); search.querySelector('input')?.focus(); };
+  const closeSearch = () => { if (!search || search.hidden) return; search.hidden = true; document.body.classList.remove('modal-open'); document.querySelector('[data-search-open]')?.focus(); };
+  document.querySelectorAll('[data-search-open]').forEach(b => b.addEventListener('click', openSearch));
+  search?.querySelector('[data-search-close]')?.addEventListener('click', closeSearch);
+  search?.addEventListener('click', e => { if (e.target === search) closeSearch(); });
+
+  /* Film modal (YouTube, loaded only when asked for) */
+  const film = document.getElementById('filmModal');
+  const closeFilm = () => { if (!film || film.hidden) return; film.hidden = true; film.querySelector('[data-film-player]').innerHTML = ''; document.body.classList.remove('modal-open'); };
+  document.querySelectorAll('[data-film-open]').forEach(b => b.addEventListener('click', () => {
+    if (!film) return;
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(b.dataset.film) + '?autoplay=1&rel=0';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.title = b.textContent.trim();
+    film.querySelector('[data-film-player]').replaceChildren(f);
+    film.hidden = false; document.body.classList.add('modal-open');
+    film.querySelector('[data-film-close]')?.focus();
+  }));
+  film?.querySelector('[data-film-close]')?.addEventListener('click', closeFilm);
+  film?.addEventListener('click', e => { if (e.target === film) closeFilm(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSearch(); closeFilm(); megaItems.forEach(i => i.classList.contains('is-open') && setMega(i, false)); } });
+
+  /* Launch rail: arrows scroll one card, counter follows */
+  document.querySelectorAll('[data-rail]').forEach(rail => {
+    const track = rail.querySelector('[data-rail-track]');
+    const cards = [...(track?.querySelectorAll('[data-rail-item]') || [])];
+    const count = rail.querySelector('[data-rail-count]');
+    if (!track || !cards.length) return;
+    const step = () => cards[0].getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 24);
+    const dir = rtl ? -1 : 1;
+    rail.querySelector('[data-rail-prev]')?.addEventListener('click', () => track.scrollBy({ left: -step() * dir, behavior: reduceMotion ? 'auto' : 'smooth' }));
+    rail.querySelector('[data-rail-next]')?.addEventListener('click', () => track.scrollBy({ left: step() * dir, behavior: reduceMotion ? 'auto' : 'smooth' }));
+    const update = () => {
+      const i = Math.min(cards.length - 1, Math.round(Math.abs(track.scrollLeft) / step()));
+      if (count) count.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0');
+    };
+    track.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
+  });
+
+  /* Figures count up once, when they come into view */
+  const counters = document.querySelectorAll('[data-count]');
+  if (counters.length && 'IntersectionObserver' in window && !reduceMotion) {
+    const io = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      io.unobserve(entry.target);
+      const el = entry.target, end = parseInt(el.dataset.count, 10) || 0, suffix = el.dataset.suffix || '';
+      const t0 = performance.now();
+      const tick = now => {
+        const p = Math.min(1, (now - t0) / 1400), v = Math.round(end * (1 - Math.pow(1 - p, 3)));
+        el.textContent = v + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }), { threshold: .6 });
+    counters.forEach(c => io.observe(c));
+  }
+
+  /* Project page: highlight the sub-nav section in view */
+  const subLinks = [...document.querySelectorAll('[data-subnav] a[href^="#"]')];
+  if (subLinks.length && 'IntersectionObserver' in window) {
+    const map = new Map(subLinks.map(a => [document.querySelector(a.getAttribute('href')), a]).filter(([el]) => el));
+    const so = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      subLinks.forEach(a => a.classList.remove('is-active'));
+      map.get(entry.target)?.classList.add('is-active');
+    }), { rootMargin: '-40% 0px -55% 0px' });
+    map.forEach((_, el) => so.observe(el));
+  }
+
   /* Home hero slides */
   const hero = document.querySelector('[data-hero]');
   const slides = [...(hero?.querySelectorAll('[data-hero-slide]') || [])];
@@ -57,11 +149,12 @@
       load(slides[next]);
       [slides, copies].forEach(list => { list[current]?.classList.remove('is-active'); list[next]?.classList.add('is-active'); });
       dots.forEach((d, n) => n === next ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current'));
+      slides.forEach((sl, n) => { const v = sl.querySelector('video'); if (!v) return; if (n === next) { v.play?.().catch(() => {}); } else v.pause?.(); });
       current = next;
       schedule();
     };
     dots.forEach((d, n) => d.addEventListener('click', () => { paused = true; clearTimeout(timer); show(n); }));
-    hero.addEventListener('focusin', e => { if (e.target.closest('.search-bar')) { paused = true; clearTimeout(timer); } });
+    hero.addEventListener('focusin', e => { if (e.target.closest('.search-bar, .finder')) { paused = true; clearTimeout(timer); } });
     let touchX = null;
     hero.addEventListener('touchstart', e => { touchX = e.changedTouches[0]?.clientX ?? null; }, { passive: true });
     hero.addEventListener('touchend', e => {

@@ -87,7 +87,7 @@
                     <tbody>
                         @forelse ($projects as $p)
                             <tr>
-                                <td><div class="d-flex align-items-center gap-2">@if ($p->image)<img class="recent-thumb" src="{{ asset(str_starts_with($p->image, 'storage/') ? $p->image : 'storage/'.$p->image) }}" alt="">@else<span class="recent-thumb d-inline-block"></span>@endif<span class="fw-semibold">{{ \Illuminate\Support\Str::limit($p->t()?->title, 48) }}</span></div></td>
+                                <td><div class="d-flex align-items-center gap-2">@if ($p->image)<img class="recent-thumb" src="{{ media_url($p->image) }}" alt="">@else<span class="recent-thumb d-inline-block"></span>@endif<span class="fw-semibold">{{ \Illuminate\Support\Str::limit($p->t()?->title, 48) }}</span></div></td>
                                 <td>@if ($p->status)<span class="badge bg-success-subtle text-success-emphasis">{{ $p->state === 'ongoing' ? 'Under construction' : ucfirst($p->state ?? '') }}</span>@else<span class="badge bg-secondary-subtle text-secondary-emphasis">Hidden</span>@endif</td>
                                 <td class="text-end"><div class="act-group"><x-act kind="view" :href="route('projects.show', ['locale' => 'en', 'slug' => $p->slug])" blank /><a class="btn btn-sm btn-light-secondary" href="{{ url('admin/projects/'.$p->id.'/gallery') }}">Gallery</a></div></td>
                             </tr>
@@ -120,7 +120,7 @@
             <div class="card-body">
                 @forelse ($posts as $post)
                     <div class="d-flex align-items-center gap-3 py-2 {{ $loop->last ? '' : 'border-bottom' }}">
-                        @if ($post->thumb_small || $post->thumb_large)<img class="recent-thumb" src="{{ asset('storage/'.($post->thumb_small ?: $post->thumb_large)) }}" alt="">@endif
+                        @if ($post->thumb_small || $post->thumb_large)<img class="recent-thumb" src="{{ media_url(($post->thumb_small ?: $post->thumb_large)) }}" alt="">@endif
                         <div class="min-w-0 flex-grow-1"><div class="fw-semibold text-truncate">{{ $post->t()?->title }}</div><small class="text-muted">{{ $post->created_at?->format('j M Y') }}</small></div>
                         <x-act kind="view" :href="route('blog.show', ['locale' => 'en', 'slug' => $post->slug])" blank />
                     </div>

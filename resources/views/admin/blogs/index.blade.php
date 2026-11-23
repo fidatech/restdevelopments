@@ -424,7 +424,7 @@
                 document.querySelector('[name="blog_category_id"]').value = row.blog_category_id;
 
                 const box = document.getElementById('imgPreview');
-                box.innerHTML = row.thumb_small ? `<img src="/${row.thumb_small}" style="width:50%; max-height:340px;">` : '';
+                box.innerHTML = row.thumb_small ? `<img src="${mediaUrl(row.thumb_small)}" style="width:50%; max-height:340px;">` : '';
 
                 // Set Translations and Editor Content
                 locales.forEach(loc => {

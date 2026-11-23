@@ -19,6 +19,10 @@ require $root.'/vendor/autoload.php';
 $app = require $root.'/bootstrap/app.php';
 $kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
+// staged helpers (new functions only; the live ones stay as they are)
+if (is_file(dirname($stagedViews, 2).'/app/Support/helpers.php')) {
+    require_once dirname($stagedViews, 2).'/app/Support/helpers.php';
+}
 $app->make('view')->getFinder()->setPaths([$stagedViews, $root.'/resources/views']);
 $app->make('view')->getFinder()->flush();
 // compiled templates of the staged views go to a folder of their own

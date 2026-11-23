@@ -1,0 +1,114 @@
+name: Publish URL and image fixes, storage link
+on:
+  push:
+    branches: [redesign/rest-signature]
+    paths: [.github/workflows/publish-media-fix.yml]
+permissions:
+  contents: read
+concurrency: restdevelopments-public-theme
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASELINE: a02928c3a555af285185d1bbccf831667b974517
+      HOST: awt-c8-us.afgnoc.com
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check JavaScript
+        run: node --check public/assets/js/heritage.js
+      - name: Connect to server
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$KEY" && test -n "$FINGERPRINT"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+      - name: Render every public page with live data before publishing
+        run: |
+          set -euo pipefail
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-rest-stage.XXXXXXXX"')
+          tar -cf - resources/views app/Support/helpers.php scripts/validate-heritage.php scripts/validate-admin.php | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          for uri in /en/ /fa/ /en/about /en/projects /en/latest-launches /en/contact /en/team /en/blog /en/careers /__project /__blog /__career; do
+            ssh "${ssh_opts[@]}" "$server" "php '$stage/scripts/validate-heritage.php' '$stage/resources/views' '$uri'"
+          done
+          ssh "${ssh_opts[@]}" "$server" "php '$stage/scripts/validate-admin.php' '$stage/resources/views' '$stage/admin-out'"
+          ssh "${ssh_opts[@]}" "$server" "rm -rf '$stage'"
+      - name: Back up and publish
+        run: |
+          set -euo pipefail
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          mapfile -t files < <(git diff --name-only --diff-filter=AM "$BASELINE" HEAD -- public/assets public/admin-ui resources/views app/Support/helpers.php app/Providers/AppServiceProvider.php app/Http/Controllers/Admin)
+          printf '%s\n' "${files[@]}"
+          : > rest-manifest.tsv
+          for path in "${files[@]}"; do
+            if expected=$(git rev-parse --verify "$BASELINE:$path" 2>/dev/null); then
+              printf '%s\t%s\n' "$expected" "$path" >> rest-manifest.tsv
+            else
+              printf 'NEW\t%s\n' "$path" >> rest-manifest.tsv
+            fi
+          done
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-rest-release.XXXXXXXX"')
+          tar -cf - "${files[@]}" scripts/deploy-rest-theme.sh rest-manifest.tsv | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          ssh "${ssh_opts[@]}" "$server" "bash '$stage/scripts/deploy-rest-theme.sh' '$stage'"
+      - name: Storage link (uploads copied first, old folder kept)
+        run: |
+          set -euo pipefail
+          ssh -p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts" "restdevelopments@$HOST" bash -s <<'SH'
+          set -euo pipefail
+          cd /home/restdevelopments/public_html
+          if [ -L public/storage ]; then echo "public/storage is already a link to $(readlink public/storage)"; exit 0; fi
+          ts=$(date +%Y%m%d-%H%M%S)
+          du -sh public/storage storage/app/public
+          # keep what storage/app/public had, then bring every upload into it (the served copies win)
+          cp -a storage/app/public "storage/app/public.before-link-$ts"
+          cp -a public/storage/. storage/app/public/
+          missing=$(cd public/storage && find . -type f | while IFS= read -r f; do [ -e "/home/restdevelopments/public_html/storage/app/public/$f" ] || echo "$f"; done | wc -l)
+          echo "files missing after the copy: $missing"
+          test "$missing" = 0
+          mv public/storage "public/storage.before-link-$ts"
+          php artisan storage:link
+          ls -la public | grep storage
+          f=$(cd storage/app/public && find uploads -type f \( -name '*.webp' -o -name '*.jpg' -o -name '*.png' \) | head -1)
+          code=$(curl -s -o /dev/null -w '%{http_code}' "https://restdevelopments.com/storage/$f")
+          echo "/storage/$f HTTP $code"
+          if [ "$code" != 200 ]; then
+            rm public/storage
+            mv "public/storage.before-link-$ts" public/storage
+            echo "The web server does not follow the link; the folder is back as it was"
+            exit 1
+          fi
+          echo "Storage link works. Old folders kept: public/storage.before-link-$ts and storage/app/public.before-link-$ts"
+          SH
+      - name: Check the live site
+        run: |
+          set -euo pipefail
+          sleep 5
+          for path in /en/ /en/projects /en/contact /fa/; do
+            code=$(curl -sL -o /tmp/page.html -w '%{http_code}' "https://restdevelopments.com$path")
+            echo "$path HTTP $code"
+            test "$code" = 200
+            grep -q 'socialRedirectModal' /tmp/page.html
+            n=$(grep -c 'restdevelopments.com/public' /tmp/page.html || true); echo "  links with /public: $n"; test "$n" = 0
+          done
+          for u in /public/en/ /public/admin/blogs; do printf '%s ' "$u"; curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' "https://restdevelopments.com$u"; done
+          img=$(curl -sL https://restdevelopments.com/en/projects | grep -o 'https://restdevelopments.com/storage/[^"]*' | head -3)
+          for i in $img; do printf '%s ' "$i"; curl -s -o /dev/null -w '%{http_code}\n' "$i"; done
+          curl -sf -o /tmp/c.css https://restdevelopments.com/assets/css/heritage.css && grep -q 'overflow-x: clip' /tmp/c.css
+          curl -sf -o /dev/null https://restdevelopments.com/assets/fonts/dmsans-var.woff
+          curl -sf -o /dev/null https://restdevelopments.com/assets/img/brand/rest-logo-mask.png
+          code=$(curl -s -o /tmp/login.html -w '%{http_code}' https://restdevelopments.com/login); echo "/login HTTP $code"; test "$code" = 200
+          grep -q 'admin-ui/css/app.css' /tmp/login.html
+          code=$(curl -s -o /dev/null -w '%{http_code}' https://restdevelopments.com/admin/dashboard); echo "/admin/dashboard signed out HTTP $code"; test "$code" = 302
+          for a in admin-ui/css/app.css admin-ui/js/app.js admin-ui/icons.svg admin-ui/img/rest-mark.png; do curl -sf -o /dev/null "https://restdevelopments.com/$a" && echo "$a OK"; done
+          echo "Live site and admin panel are serving the new templates."

@@ -96,7 +96,7 @@ class BlogController extends Controller
             ->addIndexColumn()
             ->addColumn('thumb', function ($b) {
                 return $b->thumb_small
-                    ? '<img src="' . asset($b->thumb_small) . '" style="height:40px;">'
+                    ? '<img src="' . media_url($b->thumb_small) . '" style="height:40px;">'
                     : '';
             })
             ->addColumn('title', fn($b) => $b->t()?->title)

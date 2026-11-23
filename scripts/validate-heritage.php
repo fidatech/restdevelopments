@@ -13,6 +13,10 @@ $kernel = $app->make(Kernel::class);
 $request = Request::create('https://restdevelopments.com'.$uri, 'GET');
 $app->instance('request', $request);
 $kernel->bootstrap();
+// staged helpers (new functions only; the live ones stay as they are)
+if (is_file(dirname($stagedViews, 2).'/app/Support/helpers.php')) {
+    require_once dirname($stagedViews, 2).'/app/Support/helpers.php';
+}
 $finder = $app->make('view')->getFinder();
 $finder->setPaths([$stagedViews, $root.'/resources/views']);
 $finder->flush();

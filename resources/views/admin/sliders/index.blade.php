@@ -29,7 +29,7 @@
               <div class="slider-card h-100">
                 <div class="slider-media ratio ratio-16x9">
                   @if($s->image)
-                    <img src="{{ asset('storage/'.$s->image) }}" alt="Slider image">
+                    <img src="{{ media_url($s->image) }}" alt="Slider image">
                   @endif
 
                   <span class="ribbon {{ $s->status === 'published' ? '' : 'draft' }}">

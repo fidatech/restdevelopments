@@ -36,10 +36,10 @@ class ProjectAmenityController extends Controller
             ->addIndexColumn()
             ->addColumn('title', fn($a) => $a->t()?->title)
             ->addColumn('image', fn($a) =>
-                '<img src="'.asset($a->image).'" height="50">'
+                '<img src="'.media_url($a->image).'" height="50">'
             )
             ->addColumn('icon', fn($a) =>
-                '<img src="'.asset($a->icon).'" height="30" style="border-radius:6px;background:#000;margin-top:7px;">'
+                '<img src="'.media_url($a->icon).'" height="30" style="border-radius:6px;background:#000;margin-top:7px;">'
             )
             ->addColumn('actions', fn($a) =>
                 view('admin.amenities._actions', ['a'=>$a])->render()

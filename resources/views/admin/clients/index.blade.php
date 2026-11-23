@@ -30,7 +30,7 @@
                 @foreach($clients as $client)
                     <tr data-id="{{ $client->id }}">
                         <td>{{ $client->order }}</td>
-                        <td><img src="{{ asset('storage/'.$client->image) }}" height="50"></td>
+                        <td><img src="{{ media_url($client->image) }}" height="50"></td>
                         <td>{{ $client->link }}</td>
                         <td>
                             <button type="button" class="btn-act is-amber btn-edit" data-id="{{ $client->id }}" title="Edit" aria-label="Edit"><x-icon name="pen" /></button>
@@ -107,7 +107,7 @@ $(document).on('click','.btn-edit',async function(){
   const data = await res.json();
   $('[name="link"]').val(data.link);
   $('[name="order"]').val(data.order);
-  $('#preview').html(`<img src="{{ asset('storage') }}/`+data.image+`" height="50">`);
+  $('#preview').html(`<img src="${mediaUrl(data.image)}" height="50">`);
   modal.show();
 });
 

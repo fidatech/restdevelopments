@@ -22,7 +22,7 @@
                 <div class="recent-post">
                     <div class="media-img">
                         <a href="{{ route('blog.show',[app()->getLocale(),$post->slug]) }}">
-                            <img src="{{ asset('storage/'.$post->thumb_small) }}" alt="{{ $post->t()?->title }}">
+                            <img src="{{ media_url($post->thumb_small) }}" alt="{{ $post->t()?->title }}">
                         </a>
                     </div>
                     <div class="media-body">

@@ -23,11 +23,11 @@
               <div class="swiper-slide">
                 <div class="aminities-card" data-mask-src="{{ asset('assets/img/theme-img/aminities-shape1.png') }}">
                     <div class="aminities-card-img">
-                      <img src="{{ asset('storage/'.$a->image) }}" alt="">
+                      <img src="{{ media_url($a->image) }}" alt="">
                     </div>
                     <div class="aminities-content">
                       <div class="aminities-card-icon">
-                        <img src="{{ asset('storage/'.$a->icon) }}" alt="">
+                        <img src="{{ media_url($a->icon) }}" alt="">
                       </div>
                       <h3 class="box-title">{{ $a->t()?->title }}</h3>
                     </div>

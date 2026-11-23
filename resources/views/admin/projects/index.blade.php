@@ -388,7 +388,7 @@
                     imgPreview.innerHTML = '';
                     if (row.image) {
                         const img = document.createElement('img');
-                        img.src = '{{ asset('storage') }}' + '/' + row.image;
+                        img.src = mediaUrl(row.image);
                         img.style.width = '800px';
                         img.style.height = '440px';
                         imgPreview.appendChild(img);

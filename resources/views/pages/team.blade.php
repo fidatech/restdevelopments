@@ -7,7 +7,7 @@
     <div class="wrap">
         <div class="people">
             @forelse($team as $member)
-                <article class="person"><div class="person-photo">@if($member->image)<img src="{{ asset('storage/'.$member->image) }}" alt="{{ $member->t()?->name }}" loading="lazy" width="480" height="600">@endif</div><h2>{{ $member->t()?->name }}</h2><p>{{ $member->t()?->position }}</p></article>
+                <article class="person"><div class="person-photo">@if($member->image)<img src="{{ media_url($member->image) }}" alt="{{ $member->t()?->name }}" loading="lazy" width="480" height="600">@endif</div><h2>{{ $member->t()?->name }}</h2><p>{{ $member->t()?->position }}</p></article>
             @empty
                 <p class="empty">{{ __('Team profiles will be added soon.') }}</p>
             @endforelse

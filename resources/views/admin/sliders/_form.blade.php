@@ -55,7 +55,7 @@
             <input type="file" name="image" id="inputDesktop" class="form-control upload-input" accept="image/*">
             <div class="preview ratio mt-2" id="previewDesktop">
               @isset($slider->image)
-                <img src="{{ asset('storage/'.$slider->image) }}" alt="Desktop Preview">
+                <img src="{{ media_url($slider->image) }}" alt="Desktop Preview">
               @endisset
             </div>
           </div>
@@ -69,7 +69,7 @@
             <input type="file" name="image_mobile" id="inputMobile" class="form-control upload-input" accept="image/*">
             <div class="preview ratio mt-2" id="previewMobile">
               @isset($slider->image_mobile)
-                <img src="{{ asset('storage/'.$slider->image_mobile) }}" alt="Mobile Preview">
+                <img src="{{ media_url($slider->image_mobile) }}" alt="Mobile Preview">
               @endisset
             </div>
           </div>

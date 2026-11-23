@@ -35,7 +35,7 @@ class ProjectDocumentController extends Controller
             ->addIndexColumn()
             ->addColumn('preview', function (ProjectDocument $d) {
                 $img = $d->preview_image
-                    ? asset($d->preview_image)
+                    ? media_url($d->preview_image)
                     : asset('assets/img/pdf-placeholder.webp');
 
                 return '<img src="' . $img . '" class="img-fluid rounded" style="max-width:120px">';
@@ -43,7 +43,7 @@ class ProjectDocumentController extends Controller
             ->addColumn('title', fn($d) => e($d->title ?? '—'))
             ->addColumn('type', fn($d) => ucwords(str_replace('_', ' ', $d->type)))
             ->addColumn('file', fn($d) =>
-                '<a href="' . asset($d->file) . '" target="_blank" class="btn btn-sm btn-outline-primary">
+                '<a href="' . media_url($d->file) . '" target="_blank" class="btn btn-sm btn-outline-primary">
                     <i class="fas fa-file-pdf me-1"></i> View PDF
                  </a>'
             )

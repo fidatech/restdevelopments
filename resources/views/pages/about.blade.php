@@ -11,7 +11,7 @@
 <section class="section">
     <div class="wrap">
         <article class="feature">
-            <div class="feature-media"><img src="{{ $about?->image_left ? asset('storage/'.$about->image_left) : asset('assets/img/brand/aerial.webp') }}" alt="{{ __('A Rest Developments project') }}" width="1000" height="620" decoding="async"></div>
+            <div class="feature-media"><img src="{{ $about?->image_left ? media_url($about->image_left) : asset('assets/img/brand/aerial.webp') }}" alt="{{ __('A Rest Developments project') }}" width="1000" height="620" decoding="async"></div>
             <div>
                 <span class="eyebrow">{{ __('Our story') }}</span>
                 <h2>{{ __('A clear purpose. A lasting place.') }}</h2>
@@ -61,7 +61,7 @@
         <div class="section-head"><h2>{{ __('Our people') }}</h2><a class="text-link" href="{{ route('team.index', ['locale' => $locale]) }}">{{ __('Meet the whole team') }} @include('partials.arrow')</a></div>
         <div class="people">
             @foreach($team->take(4) as $member)
-                <article class="person"><div class="person-photo">@if($member->image)<img src="{{ asset('storage/'.$member->image) }}" alt="{{ $member->t()?->name }}" width="480" height="600" loading="lazy">@endif</div><h3>{{ $member->t()?->name }}</h3><p>{{ $member->t()?->position }}</p></article>
+                <article class="person"><div class="person-photo">@if($member->image)<img src="{{ media_url($member->image) }}" alt="{{ $member->t()?->name }}" width="480" height="600" loading="lazy">@endif</div><h3>{{ $member->t()?->name }}</h3><p>{{ $member->t()?->position }}</p></article>
             @endforeach
         </div>
     </div>

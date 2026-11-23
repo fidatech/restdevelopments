@@ -164,6 +164,7 @@
 @endforeach
 @if (session('error'))<div data-toast="danger" hidden>{{ session('error') }}</div>@endif
 
+<script>window.mediaUrl = function (p) { if (!p) return ''; if (/^(https?:)?\/\//i.test(p)) return p; p = String(p).replace(/^\/?(public\/)?/, ''); if (!/^(storage|assets|admin-ui)\//.test(p)) p = 'storage/' + p; return {!! json_encode(rtrim(url('/'), '/').'/') !!} + p; };</script>
 <script>window.ERP_TEXT = {"cancel":"Cancel","confirmOk":"Yes","confirmTitle":"Are you sure?","noResults":"No results","addNew":"New","failed":"Something went wrong. Please try again."};</script>
 <script src="{{ $ui('js/app.js') }}" defer></script>
 <script>

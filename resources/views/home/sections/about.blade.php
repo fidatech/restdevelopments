@@ -33,7 +33,7 @@
                     <div class="img-box1">
                         <div class="img1 img-shine" data-mask-src="{{ asset('assets/img/shape/about-1-mask.png') }}">
                             @if ($about->image_left)
-                                <img src="{{ asset('storage/' . $about->image_left) }}" style="width: 636px; height: 336px;" alt="About">
+                                <img src="{{ media_url($about->image_left) }}" style="width: 636px; height: 336px;" alt="About">
                             @endif
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                     <div class="img-box1">
                         <div class="img1 img-shine" data-mask-src="{{ asset('assets/img/shape/about-1-mask.png') }}">
                             @if ($about->image_right)
-                                <img src="{{ asset('storage/' . $about->image_right) }}" style="width: 636px; height: 336px;" alt="About">
+                                <img src="{{ media_url($about->image_right) }}" style="width: 636px; height: 336px;" alt="About">
                             @endif
                         </div>
                     </div>
@@ -58,7 +58,7 @@
                             </div>
                             <div class="about-tag-thumb">
                                 @if ($about->tag_image)
-                                    <img src="{{ asset('storage/' . $about->tag_image) }}" style="width: 201px; height: 200px; object-fit: cover; border-radius: 12px;"
+                                    <img src="{{ media_url($about->tag_image) }}" style="width: 201px; height: 200px; object-fit: cover; border-radius: 12px;"
                                         alt="img">
                                 @endif
                             </div>

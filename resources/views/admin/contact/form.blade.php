@@ -121,8 +121,8 @@
                                 </div>
                                 @if($setting->logo_dark)
                                 <div class="logo-preview ms-3">
-                                    <img src="{{ asset('storage/'.$setting->logo_dark) }}" height="50" class="rounded border">
-                                    <a href="{{ asset('storage/'.$setting->logo_dark) }}" target="_blank" class="preview-link">
+                                    <img src="{{ media_url($setting->logo_dark) }}" height="50" class="rounded border">
+                                    <a href="{{ media_url($setting->logo_dark) }}" target="_blank" class="preview-link">
                                         <x-icon name="eye" />
                                     </a>
                                 </div>
@@ -142,8 +142,8 @@
                                 </div>
                                 @if($setting->logo_white)
                                 <div class="logo-preview ms-3">
-                                    <img src="{{ asset('storage/'.$setting->logo_white) }}" height="50" class="rounded border bg-dark p-1">
-                                    <a href="{{ asset('storage/'.$setting->logo_white) }}" target="_blank" class="preview-link">
+                                    <img src="{{ media_url($setting->logo_white) }}" height="50" class="rounded border bg-dark p-1">
+                                    <a href="{{ media_url($setting->logo_white) }}" target="_blank" class="preview-link">
                                         <x-icon name="eye" />
                                     </a>
                                 </div>

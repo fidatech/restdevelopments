@@ -49,7 +49,7 @@
                             <div class="portfolio-card style4 luxury-card">
                                 <div class="portfolio-img luxury-img">
                                     @if ($p->image)
-                                        <img src="{{ asset('storage/' . $p->image) }}" alt="{{ $tr?->title }}">
+                                        <img src="{{ media_url($p->image) }}" alt="{{ $tr?->title }}">
                                     @else
                                         <img src="{{ asset('assets/img/placeholder/16x9.jpg') }}" alt="{{ $tr?->title ?? 'Project' }}">
                                     @endif

@@ -6,7 +6,7 @@
 @endphp
 <article class="card">
     <div class="card-media">
-        @if($project->image)<img src="{{ asset('storage/'.$project->image) }}" alt="" loading="lazy" decoding="async" width="800" height="600">@endif
+        @if($project->image)<img src="{{ media_url($project->image) }}" alt="" loading="lazy" decoding="async" width="800" height="600">@endif
         @if($state)<span class="badge {{ $state === 'ongoing' ? 'badge--gold' : '' }}">{{ $state === 'ongoing' ? __('Under construction') : __(ucfirst($state)) }}</span>@endif
     </div>
     @if($project->location)<p class="card-place">{{ $project->location }}</p>@endif

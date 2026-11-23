@@ -33,7 +33,7 @@ class ProjectGalleryController extends Controller
         return DataTables::of($q)
             ->addIndexColumn()
             ->addColumn('preview', function (ProjectGallery $g) {
-                return '<img src="'.asset($g->image).'" alt="gallery"
+                return '<img src="'.media_url($g->image).'" alt="gallery"
                         class="img-fluid rounded" style="max-width:160px">';
             })
             ->addColumn('type', fn(ProjectGallery $g) => ucwords($g->type))

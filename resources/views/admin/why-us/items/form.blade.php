@@ -26,7 +26,7 @@
                     <label class="form-label">Icon (upload)</label>
                     <input type="file" name="icon" class="form-control">
                     @if($item->icon)
-                        <div class="mt-1"><img src="{{ asset('storage/'.$item->icon) }}" height="40"></div>
+                        <div class="mt-1"><img src="{{ media_url($item->icon) }}" height="40"></div>
                     @endif
                 </div>
 
@@ -34,7 +34,7 @@
                     <label class="form-label">Image (upload)</label>
                     <input type="file" name="image" class="form-control">
                     @if($item->image)
-                        <div class="mt-1"><img src="{{ asset('storage/'.$item->image) }}" height="40"></div>
+                        <div class="mt-1"><img src="{{ media_url($item->image) }}" height="40"></div>
                     @endif
                 </div>
 

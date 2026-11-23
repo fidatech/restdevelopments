@@ -25,7 +25,7 @@
           <label class="form-label">Image (416×550)</label>
           <input type="file" name="image" class="form-control">
           @if($team->image)
-            <div class="mt-1"><img src="{{ asset('storage/'.$team->image) }}" height="80"></div>
+            <div class="mt-1"><img src="{{ media_url($team->image) }}" height="80"></div>
           @endif
         </div>
 

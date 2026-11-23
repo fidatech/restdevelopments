@@ -20,8 +20,8 @@
           $sub      = $t?->subheadline;
           $ctaText  = $t?->button_text;
           $ctaUrl   = $t?->button_url;
-          $desktop  = $s->image ? asset('storage/'.$s->image) : null;
-          $mobile   = asset('storage/'.($s->image_mobile ?: $s->image));
+          $desktop  = $s->image ? media_url($s->image) : null;
+          $mobile   = media_url(($s->image_mobile ?: $s->image));
         @endphp
 
         <div class="swiper-slide">

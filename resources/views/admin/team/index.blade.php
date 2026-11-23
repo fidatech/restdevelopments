@@ -30,7 +30,7 @@
                             <tr>
                                 <td>{{ $team->order }}</td>
                                 <td>
-                                    <img src="{{ asset('storage/' . $team->image) }}" alt="" width="50">
+                                    <img src="{{ media_url($team->image) }}" alt="" width="50">
                                 </td>
                                 <td>{{ $team->t()?->name }}</td>
                                 <td>{{ $team->t()?->position }}</td>

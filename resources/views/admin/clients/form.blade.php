@@ -27,7 +27,7 @@
                     <label class="form-label">Image (200×200)</label>
                     <input type="file" name="image" class="form-control" {{ $client->exists ? '' : 'required' }}>
                     @if($client->image)
-                        <img src="{{ asset('storage/'.$client->image) }}" height="70" class="mt-1">
+                        <img src="{{ media_url($client->image) }}" height="70" class="mt-1">
                     @endif
                 </div>
 

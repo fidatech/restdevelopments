@@ -13,7 +13,7 @@
                         <h2><a href="{{ route('blog.show', ['locale' => app()->getLocale(), 'slug' => $post->slug]) }}">{{ $post->t()?->title }}</a></h2>
                         <p>{{ \Illuminate\Support\Str::limit(trim(strip_tags($post->t()?->content ?? '')), 160) }}</p>
                     </div>
-                    <div class="news-thumb">@if($post->thumb_large)<img src="{{ asset('storage/'.$post->thumb_large) }}" alt="" loading="lazy" width="640" height="400">@endif</div>
+                    <div class="news-thumb">@if($post->thumb_large)<img src="{{ media_url($post->thumb_large) }}" alt="" loading="lazy" width="640" height="400">@endif</div>
                 </article>
             @empty
                 <p class="empty">{{ __('No news yet. Follow us on social media for the latest updates.') }}</p>

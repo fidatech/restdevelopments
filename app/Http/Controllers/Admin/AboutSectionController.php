@@ -31,7 +31,7 @@ class AboutSectionController extends Controller
                 ->addIndexColumn()
                 ->addColumn('icon_preview', function ($row) {
                     if ($row->icon_set === 'image' && $row->image) {
-                        return '<img src="' . asset($row->image) . '" style="height:32px;border-radius:6px">';
+                        return '<img src="' . media_url($row->image) . '" style="height:32px;border-radius:6px">';
                     }
                     if ($row->icon_set === 'feather' && $row->icon) return '<i data-feather="' . e($row->icon) . '"></i>';
                     if ($row->icon_set === 'bi' && $row->icon) return '<i class="bi ' . e($row->icon) . ' fs-5"></i>';
@@ -281,6 +281,6 @@ class AboutSectionController extends Controller
 
         file_put_contents($absolute, (string) $image->toWebp($quality));
 
-        return $relative; // store this in DB; render via asset($relative)
+        return $relative; // store this in DB; render via media_url($relative)
     }
 }

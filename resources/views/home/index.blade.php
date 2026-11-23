@@ -16,13 +16,13 @@
 <section class="hero" aria-label="{{ __('Featured developments') }}" data-hero>
     @foreach($heroSlides as $index => $slide)
         @php
-            $desktop = $slide?->image ? asset('storage/'.$slide->image) : asset('assets/img/brand/towers.webp');
-            $mobile = $slide?->image_mobile ? asset('storage/'.$slide->image_mobile) : $desktop;
+            $desktop = $slide?->image ? media_url($slide->image) : asset('assets/img/brand/towers.webp');
+            $mobile = $slide?->image_mobile ? media_url($slide->image_mobile) : $desktop;
             if ($slide?->image) {
                 $desktopFile = 'assets/img/slider/slide-'.$slide->id.'-'.substr(sha1($slide->image), 0, 10).'-desktop.webp';
                 $mobileFile = 'assets/img/slider/slide-'.$slide->id.'-'.substr(sha1($slide->image_mobile ?: $slide->image), 0, 10).'-mobile.webp';
-                if (is_file(public_path($desktopFile))) $desktop = asset($desktopFile);
-                if (is_file(public_path($mobileFile))) $mobile = asset($mobileFile);
+                if (is_file(public_path($desktopFile))) $desktop = media_url($desktopFile);
+                if (is_file(public_path($mobileFile))) $mobile = media_url($mobileFile);
             }
         @endphp
         <div class="hero-slide{{ $index === 0 ? ' is-active' : '' }}" data-hero-slide aria-hidden="true">
@@ -115,7 +115,7 @@
                 $url = route('projects.show', ['locale' => $locale, 'slug' => $project->slug]);
             @endphp
             <article class="launch{{ $i === 0 ? ' is-active' : '' }}" data-launch>
-                <a class="launch-media" href="{{ $url }}" tabindex="-1" aria-hidden="true">@if($project->image)<img src="{{ asset('storage/'.$project->image) }}" alt="" loading="lazy" decoding="async" width="1100" height="600">@endif</a>
+                <a class="launch-media" href="{{ $url }}" tabindex="-1" aria-hidden="true">@if($project->image)<img src="{{ media_url($project->image) }}" alt="" loading="lazy" decoding="async" width="1100" height="600">@endif</a>
                 <div>
                     @if($project->location)<p class="launch-place">{{ $project->location }}</p>@endif
                     <h3>{{ $tr?->title }}</h3>
@@ -151,7 +151,7 @@
         <div class="tiles">
             @foreach($exploreProjects as $project)
                 <a class="tile" href="{{ route('projects.show', ['locale' => $locale, 'slug' => $project->slug]) }}">
-                    @if($project->image)<img src="{{ asset('storage/'.$project->image) }}" alt="" loading="lazy" decoding="async" width="800" height="440">@endif
+                    @if($project->image)<img src="{{ media_url($project->image) }}" alt="" loading="lazy" decoding="async" width="800" height="440">@endif
                     <span class="tile-label"><span>@if($project->location)<small>{{ $project->location }}</small>@endif<strong>{{ $project->t()?->title }}</strong></span>@include('partials.arrow')</span>
                 </a>
             @endforeach
@@ -164,7 +164,7 @@
 <section class="section">
     <div class="wrap">
         <article class="feature">
-            <div class="feature-media"><img src="{{ $about?->image_left ? asset('storage/'.$about->image_left) : asset('assets/img/brand/towers-night.webp') }}" alt="{{ __('Rest Developments project') }}" loading="lazy" decoding="async" width="1000" height="620"></div>
+            <div class="feature-media"><img src="{{ $about?->image_left ? media_url($about->image_left) : asset('assets/img/brand/towers-night.webp') }}" alt="{{ __('Rest Developments project') }}" loading="lazy" decoding="async" width="1000" height="620"></div>
             <div>
                 <span class="eyebrow">{{ __('About Rest') }}</span>
                 <h2>{{ $aboutTr?->title ?: __('Building places for people') }}</h2>
@@ -212,7 +212,7 @@
                         <h3><a href="{{ route('blog.show', ['locale' => $locale, 'slug' => $post->slug]) }}">{{ $post->t()?->title }}</a></h3>
                         <p>{{ \Illuminate\Support\Str::limit(trim(strip_tags($post->t()?->content ?? '')), 140) }}</p>
                     </div>
-                    <div class="news-thumb">@if($post->thumb_large)<img src="{{ asset('storage/'.$post->thumb_large) }}" alt="" loading="lazy" decoding="async" width="640" height="400">@endif</div>
+                    <div class="news-thumb">@if($post->thumb_large)<img src="{{ media_url($post->thumb_large) }}" alt="" loading="lazy" decoding="async" width="640" height="400">@endif</div>
                 </article>
             @endforeach
         </div>

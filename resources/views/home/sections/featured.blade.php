@@ -24,7 +24,7 @@
                         $tr   = $fp->t();
                         $url  = route('projects.show', ['slug' => $fp->slug]);
                         $cover = optional($fp->galleries->first())->image ?? $fp->image;
-                        $img  = $cover ? asset('storage/' . $cover) : asset('assets/img/placeholder/16x9.jpg');
+                        $img  = $cover ? media_url($cover) : asset('assets/img/placeholder/16x9.jpg');
                     @endphp
 
                     <article class="project-card masonry-item shadow-sm border-0 rounded-4 overflow-hidden">

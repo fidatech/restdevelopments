@@ -287,7 +287,7 @@
       imgPreview.innerHTML = '';
       if (row.icon_set === 'image' && row.image){
         const img = document.createElement('img');
-        img.src = ASSET_BASE + '/' + row.image;
+        img.src = mediaUrl(row.image);
         imgPreview.appendChild(img);
       }
 

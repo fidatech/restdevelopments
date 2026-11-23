@@ -1,7 +1,7 @@
 @extends('layouts.heritage')
 @section('title', $project->t()?->title ?? __('Project'))
 @section('description', \Illuminate\Support\Str::limit(trim(strip_tags($project->t()?->description ?? '')), 155))
-@section('og_image', $project->image ? asset('storage/'.$project->image) : '')
+@section('og_image', $project->image ? media_url($project->image) : '')
 @section('content')
 @php
     $locale = app()->getLocale();
@@ -80,7 +80,7 @@
         <div class="section-head"><div><span class="eyebrow">{{ __('Downloads') }}</span><h2>{{ __('Plans and brochures') }}</h2></div></div>
         <div class="docs">
             @foreach($documents as $document)
-                <a class="doc" href="{{ asset($document->file) }}" target="_blank" rel="noopener"><strong>{{ __(\Illuminate\Support\Str::headline($document->type)) }}</strong><span>{{ __('Open PDF') }}</span></a>
+                <a class="doc" href="{{ media_url($document->file) }}" target="_blank" rel="noopener"><strong>{{ __(\Illuminate\Support\Str::headline($document->type)) }}</strong><span>{{ __('Open PDF') }}</span></a>
             @endforeach
         </div>
     </div>

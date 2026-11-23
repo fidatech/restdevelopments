@@ -84,7 +84,7 @@
                 @if ($blog->thumb_small)
                     <div class="mt-2">
 
-                        <img src="{{ asset('storage/' . $blog->thumb_small) }}" style="height:80px;">
+                        <img src="{{ media_url($blog->thumb_small) }}" style="height:80px;">
 
                     </div>
                 @endif

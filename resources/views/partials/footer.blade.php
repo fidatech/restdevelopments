@@ -10,7 +10,7 @@
                 <div class="about-logo">
                     <a href="{{ url('/') }}">
                         @if($globalContactSetting && $globalContactSetting->logo_white)
-                          <img src="{{ asset('storage/'.$globalContactSetting->logo_dark) }}" alt="Rest" style="height:100px;">
+                          <img src="{{ media_url($globalContactSetting->logo_dark) }}" alt="Rest" style="height:100px;">
                         @else
                           <img src="{{ asset('assets/img/rest_logo.png') }}" alt="Rest" style="height:100px;">
                         @endif

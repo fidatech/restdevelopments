@@ -97,7 +97,7 @@
                   <input type="file" name="image_left" class="form-control" accept="image/*">
                   <div class="preview ratio mt-2" style="--bs-aspect-ratio:56.25%">
                     @if($setting?->image_left)
-                      <img src="{{ asset('storage/'.$setting->image_left) }}" alt="">
+                      <img src="{{ media_url($setting->image_left) }}" alt="">
                     @endif
                   </div>
                 </div>
@@ -106,7 +106,7 @@
                   <input type="file" name="image_right" class="form-control" accept="image/*">
                   <div class="preview ratio mt-2" style="--bs-aspect-ratio:56.25%">
                     @if($setting?->image_right)
-                      <img src="{{ asset('storage/'.$setting->image_right) }}" alt="">
+                      <img src="{{ media_url($setting->image_right) }}" alt="">
                     @endif
                   </div>
                 </div>
@@ -115,7 +115,7 @@
                   <input type="file" name="tag_image" class="form-control" accept="image/*">
                   <div class="preview ratio mt-2" style="--bs-aspect-ratio:100%">
                     @if($setting?->tag_image)
-                      <img src="{{ asset('storage/'.$setting->tag_image) }}" alt="">
+                      <img src="{{ media_url($setting->tag_image) }}" alt="">
                     @endif
                   </div>
                 </div>

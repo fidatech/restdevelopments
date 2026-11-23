@@ -35,7 +35,7 @@ class ClientController extends Controller
         return datatables()->of($query)
             ->addIndexColumn()
             ->addColumn('image', function ($c) {
-                return '<img src="'.asset($c->image).'" height="50">';
+                return '<img src="'.media_url($c->image).'" height="50">';
             })
             ->addColumn('actions', function ($c) {
                 return '

@@ -32,7 +32,7 @@ class ProjectController extends Controller
             return DataTables::of(Project::with('translations'))
                 ->addIndexColumn()
                 ->addColumn('thumb', fn($r) =>
-                    $r->image ? '<img src="'.asset($r->image).'" style="height:80px;border-radius:6px">' : '-')
+                    $r->image ? '<img src="'.media_url($r->image).'" style="height:80px;border-radius:6px">' : '-')
                 ->addColumn('title', fn($r) => e(optional($r->t())->title))
                 ->addColumn('meta', function($r){
                     $bits = [];

@@ -22,6 +22,7 @@ html[dir="rtl"] { --sans: "Vazirmatn", Tahoma, system-ui, sans-serif; }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html, body { overflow-x: clip; }
 body { margin: 0; background: var(--white); color: var(--ink); font: 400 17px/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
 img, svg, video { max-width: 100%; height: auto; display: block; }
 a { color: inherit; text-decoration: none; }
@@ -332,6 +333,7 @@ html[dir="rtl"] .hero::after { background: linear-gradient(180deg, rgba(0,0,0,.4
 .footer-brand p { max-width: 300px; line-height: 1.6; }
 .site-footer h2 { font-size: 16px; font-weight: 500; letter-spacing: 0; color: #fff; margin-bottom: 18px; }
 .site-footer nav a, .footer-contact a { display: block; width: fit-content; padding-block: 5px; }
+.footer-contact a { overflow-wrap: anywhere; }
 .footer-contact address { font-style: normal; line-height: 1.8; margin-top: 8px; }
 .site-footer a:hover { color: var(--gold); }
 .socials { display: flex; gap: 8px; margin-top: 24px; }
@@ -441,6 +443,8 @@ html[dir="rtl"] .welcome-enter svg { transform: scaleX(-1); }
   .units td { border: 0; padding: 2px 0; }
   .role { grid-template-columns: 1fr; }
   .page-hero { min-height: 480px; }
+  .footer-top { grid-template-columns: 1fr; gap: 36px; }
+  .contact-lines dd { font-size: 22px; overflow-wrap: anywhere; }
   .welcome { padding: 0; align-items: end; }
   .welcome-panel { border-radius: 16px 16px 0 0; max-height: 100svh; }
   .welcome-visual { min-height: 140px; }

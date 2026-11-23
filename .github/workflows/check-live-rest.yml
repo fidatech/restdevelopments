@@ -1,5 +1,5 @@
 name: Check live Rest theme
-# rerun after direction A
+# rerun after mobile fix
 on:
   push:
     branches: [redesign/rest-signature]

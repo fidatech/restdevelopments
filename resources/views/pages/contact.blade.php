@@ -2,6 +2,37 @@
 @section('title', __('Contact us'))
 @section('description', __('Contact Rest Developments about our projects, apartments and company in Kabul, Termiz and Dubai.'))
 @section('content')
-<div class="page-intro"><div class="wrap"><span class="eyebrow">{{ __('Get in touch') }}</span><h1>{{ __('Let’s talk about your next place.') }}</h1><p class="lead">{{ $setting?->t()?->company_intro ?? __('Our team is here to answer your questions about Rest Developments.') }}</p></div></div>
-<section class="section"><div class="wrap split"><div class="split-copy"><span class="eyebrow">{{ __('Contact details') }}</span><h2>{{ __('We would love to hear from you.') }}</h2><p>{{ $setting?->t()?->address }}</p><p><a class="text-link" href="tel:{{ $setting?->phone_1 ?: '+93777578657' }}">{{ $setting?->phone_1 ?: '+93 777 578 657' }} </a></p><p><a class="text-link" href="mailto:{{ $setting?->email_1 ?: 'info@restdevelopments.com' }}">{{ $setting?->email_1 ?: 'info@restdevelopments.com' }} </a></p></div><div><h2>{{ __('Send an enquiry') }}</h2>@if(session('success'))<p role="status">{{ session('success') }}</p>@endif @if($errors->any())<div role="alert">{{ $errors->first() }}</div>@endif<form method="post" action="{{ route('contact.send', ['locale'=>app()->getLocale()]) }}" class="form-grid">@csrf<div class="field"><label for="name">{{ __('Name') }} *</label><input id="name" name="name" required autocomplete="name" value="{{ old('name') }}"></div><div class="field"><label for="email">{{ __('Email') }} *</label><input id="email" name="email" type="email" required autocomplete="email" value="{{ old('email') }}"></div><div class="field"><label for="phone">{{ __('Phone') }} *</label><input id="phone" name="phone" type="tel" required autocomplete="tel" value="{{ old('phone') }}"></div><div class="field"><label for="subject">{{ __('Subject') }} *</label><input id="subject" name="subject" required value="{{ old('subject') }}"></div><div class="field full"><label for="message">{{ __('Message') }}</label><textarea id="message" name="message">{{ old('message') }}</textarea></div><div class="field full"><button class="button" type="submit">{{ __('Send message') }} </button></div></form></div></div></section>
+@php($phone = $setting?->phone_1 ?: '+93 777 578 657')
+@php($email = $setting?->email_1 ?: 'info@restdevelopments.com')
+@include('partials.page-head', ['title' => __('Let’s talk about your next home.'), 'current' => __('Contact'), 'kicker' => __('Contact us'), 'lead' => $setting?->t()?->company_intro ?? __('Ask about a project, book a site visit or request a price list.')])
+<section class="section">
+    <div class="wrap contact-grid">
+        <div>
+            <h2>{{ __('Talk to our sales team') }}</h2>
+            <dl class="contact-lines">
+                <div class="contact-line"><dt>{{ __('Phone') }}</dt><dd><a href="tel:{{ preg_replace('/\s+/', '', $phone) }}" dir="ltr">{{ $phone }}</a></dd></div>
+                <div class="contact-line"><dt>{{ __('Email') }}</dt><dd><a href="mailto:{{ $email }}">{{ $email }}</a></dd></div>
+                @if($setting?->t()?->address)<div class="contact-line"><dt>{{ __('Office') }}</dt><dd>{{ $setting->t()->address }}</dd></div>@endif
+            </dl>
+            <div class="hero-actions">
+                <a class="btn" href="https://api.whatsapp.com/send?phone=+93777578657&amp;text=Hello%20Rest%20Developments" target="_blank" rel="noopener noreferrer">@include('partials.social-icon', ['name' => 'whatsapp']) WhatsApp</a>
+                <a class="btn btn--ghost" href="https://t.me/rest_developments" target="_blank" rel="noopener noreferrer">@include('partials.social-icon', ['name' => 'telegram']) Telegram</a>
+            </div>
+        </div>
+        <div class="form-card">
+            <h2 style="font-size:clamp(1.7rem,2.6vw,2.2rem);margin-bottom:1.5rem">{{ __('Send us a message') }}</h2>
+            @if(session('success'))<p class="notice" role="status">{{ session('success') }}</p>@endif
+            @if($errors->any())<div class="notice notice--error" role="alert">{{ $errors->first() }}</div>@endif
+            <form method="post" action="{{ route('contact.send', ['locale' => app()->getLocale()]) }}" class="form-grid">
+                @csrf
+                <div class="field"><label for="name">{{ __('Full name') }}</label><input id="name" name="name" required autocomplete="name" value="{{ old('name') }}"></div>
+                <div class="field"><label for="phone">{{ __('Phone') }}</label><input id="phone" name="phone" type="tel" required autocomplete="tel" value="{{ old('phone') }}" dir="ltr"></div>
+                <div class="field"><label for="email">{{ __('Email') }}</label><input id="email" name="email" type="email" required autocomplete="email" value="{{ old('email') }}"></div>
+                <div class="field"><label for="subject">{{ __('Subject') }}</label><input id="subject" name="subject" required value="{{ old('subject') }}" placeholder="{{ __('e.g. 2-bedroom apartment') }}"></div>
+                <div class="field field--full"><label for="message">{{ __('Message') }}</label><textarea id="message" name="message">{{ old('message') }}</textarea></div>
+                <div class="field field--full"><button class="btn" type="submit">{{ __('Send message') }}</button></div>
+            </form>
+        </div>
+    </div>
+</section>
 @endsection

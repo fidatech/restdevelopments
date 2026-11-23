@@ -17,7 +17,7 @@
     $bedRange = $units->pluck('bedrooms')->filter()->unique()->sort()->values();
     $keyfacts = [
         __('Starting price') => $project->price_starts_from ?: __('On request'),
-        __('Unit types') => $bedRange->count() ? $bedRange->implode(', ').' '.__('bedrooms') : ($project->beds ? $project->beds.' '.__('bedrooms') : __('On request')),
+        __('Unit types') => $bedRange->count() ? $bedRange->implode(', ').' '.($bedRange->count() === 1 && (int) $bedRange->first() === 1 ? __('bedroom') : __('bedrooms')) : ($project->beds ? $project->beds.' '.__('bedrooms') : __('On request')),
         __('Size') => $project->area ? number_format((float) $project->area).' m²' : __('On request'),
         __('Status') => $status ?: __('On request'),
         __('Location') => $project->location ?: __('On request'),

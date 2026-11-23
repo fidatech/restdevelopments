@@ -18,7 +18,7 @@
     $aboutTr = $about?->t();
     $meta = function ($p) {
         $beds = $p->units?->pluck('bedrooms')->filter()->unique()->sort()->values();
-        $types = $beds && $beds->count() ? $beds->implode(', ').' '.__('bedrooms') : ($p->beds ? $p->beds.' '.__('bedrooms') : __('On request'));
+        $types = $beds && $beds->count() ? $beds->implode(', ').' '.($beds->count() === 1 && (int) $beds->first() === 1 ? __('bedroom') : __('bedrooms')) : ($p->beds ? $p->beds.' '.__('bedrooms') : __('On request'));
         $price = $p->price_starts_from ? __('From').' '.$p->price_starts_from : __('Price on request');
         $status = $p->state === 'ongoing' ? __('Under construction') : ($p->state ? __(ucfirst($p->state)) : null);
         return compact('types', 'price', 'status');

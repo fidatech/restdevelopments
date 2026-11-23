@@ -10,18 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Download, resize and print images
+      - name: Download and print images
         run: |
-          set -euo pipefail
+          set -uo pipefail
           mkdir img && cd img
-          for p in /en/ /en/projects /en/projects?page=2 /en/blog /en/about; do curl -sL "https://restdevelopments.com$p"; done > all.html
-          grep -oE 'https://restdevelopments.com/(storage|assets/img/slider)/[^"'"'"' )]+\.(jpe?g|png|webp)' all.html | sort -u > urls.txt
-          cat urls.txt
+          for p in /en/ /en/projects "/en/projects?page=2" /en/blog /en/about /en/projects/rest-tower; do curl -sL "https://restdevelopments.com$p"; done > all.html
+          grep -oE '(https://restdevelopments.com)?/?(storage|assets/img/slider)/[^"'"'"' )]+\.(jpe?g|png|webp)' all.html | sed -E 's#^/?(storage|assets)#https://restdevelopments.com/\1#' | sort -u > urls.txt
+          # also try originals without the size suffix
+          sed -E 's/_[0-9]+x[0-9]+\.(jpe?g|png|webp)$/.\1/' urls.txt >> urls.txt.2; cat urls.txt.2 >> urls.txt
+          sort -u urls.txt -o urls.txt
           i=0
           while read -r u; do
             i=$((i+1)); f=$(printf 'img%02d' $i)
-            curl -sfL "$u" -o "$f.src" || continue
-            convert "$f.src" -resize '1400x1400>' -quality 72 "$f.jpg" || continue
-            echo "MAP $f $u $(identify -format '%wx%h' $f.jpg)"
-            base64 -w 8000 "$f.jpg" | sed "s/^/IMG $f /"
+            code=$(curl -sL -o "$f.bin" -w '%{http_code}' "$u")
+            [ "$code" = 200 ] || { echo "MISS $code $u"; continue; }
+            echo "MAP $f $(stat -c %s $f.bin) $u"
+            base64 -w 8000 "$f.bin" | sed "s/^/IMG $f /"
           done < urls.txt

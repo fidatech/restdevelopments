@@ -1,0 +1,75 @@
+name: Publish Rest theme polish
+on:
+  push:
+    branches: [redesign/rest-signature]
+    paths: [.github/workflows/publish-rest-polish.yml]
+permissions:
+  contents: read
+concurrency: restdevelopments-public-theme
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASELINE: 651ddbb78cc6656e7c551b5c3f153540ef4acf19
+      HOST: awt-c8-us.afgnoc.com
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check JavaScript
+        run: node --check public/assets/js/heritage.js
+      - name: Connect to server
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$KEY" && test -n "$FINGERPRINT"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+      - name: Render every public page with live data before publishing
+        run: |
+          set -euo pipefail
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-rest-stage.XXXXXXXX"')
+          tar -cf - resources/views scripts/validate-heritage.php | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          for uri in /en/ /fa/ /en/about /en/projects /en/latest-launches /en/contact /en/team /en/blog /en/careers /__project /__blog /__career; do
+            ssh "${ssh_opts[@]}" "$server" "php '$stage/scripts/validate-heritage.php' '$stage/resources/views' '$uri'"
+          done
+      - name: Back up and publish
+        run: |
+          set -euo pipefail
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          mapfile -t files < <(git diff --name-only --diff-filter=AM "$BASELINE" HEAD -- public/assets resources/views)
+          printf '%s\n' "${files[@]}"
+          : > rest-manifest.tsv
+          for path in "${files[@]}"; do
+            if expected=$(git rev-parse --verify "$BASELINE:$path" 2>/dev/null); then
+              printf '%s\t%s\n' "$expected" "$path" >> rest-manifest.tsv
+            else
+              printf 'NEW\t%s\n' "$path" >> rest-manifest.tsv
+            fi
+          done
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-rest-release.XXXXXXXX"')
+          tar -cf - "${files[@]}" scripts/deploy-rest-theme.sh rest-manifest.tsv | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          ssh "${ssh_opts[@]}" "$server" "bash '$stage/scripts/deploy-rest-theme.sh' '$stage'"
+      - name: Check the live site
+        run: |
+          set -euo pipefail
+          sleep 5
+          for path in /en/ /en/projects /en/contact /fa/; do
+            code=$(curl -sL -o /tmp/page.html -w '%{http_code}' "https://restdevelopments.com$path")
+            echo "$path HTTP $code"
+            test "$code" = 200
+            grep -q 'welcome-panel' /tmp/page.html
+          done
+          curl -sf https://restdevelopments.com/assets/css/heritage.css | grep -q 'rest-logo-mask'
+          curl -sf -o /dev/null https://restdevelopments.com/assets/fonts/dmsans-var.woff
+          curl -sf -o /dev/null https://restdevelopments.com/assets/img/brand/rest-logo-mask.png
+          echo "Live site is serving the new theme."

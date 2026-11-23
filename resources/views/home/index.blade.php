@@ -39,11 +39,12 @@
             </picture>
             <div class="wrap hero-copy">
                 <span class="kicker">{{ __('Kabul, Termiz and Dubai') }}</span>
-                @if($index === 0)<h1>{{ $headline }}</h1>@else<h2 class="hero-title">{{ $headline }}</h2>@endif
+                @php($long = mb_strlen($headline) > 46 ? ' is-long' : '')
+                @if($index === 0)<h1 class="hero-title{{ $long }}">{{ $headline }}</h1>@else<h2 class="hero-title{{ $long }}">{{ $headline }}</h2>@endif
                 <p class="lead">{{ $summary }}</p>
                 <div class="hero-actions">
                     <a class="btn btn--gold" href="{{ $buttonUrl }}">{{ $buttonText }}</a>
-                    <a class="btn btn--ghost" href="{{ route('contact', ['locale' => $locale]) }}">{{ __('Book a visit') }}</a>
+                    <a class="btn btn--ghost" href="{{ route('about', ['locale' => $locale]) }}">{{ __('Our story') }}</a>
                 </div>
             </div>
         </article>
@@ -73,7 +74,7 @@
         <div class="statement">
             <div class="statement-side"><span class="kicker">{{ __('About Rest Developments') }}</span></div>
             <div>
-                <p class="statement-text">{{ $aboutTr?->subtitle ?: __('We build homes and neighbourhoods where architecture, community and everyday life sit comfortably together.') }}</p>
+                <p class="statement-text{{ mb_strlen($aboutTr?->subtitle ?? '') > 160 ? ' is-long' : '' }}">{{ $aboutTr?->subtitle ?: __('We build homes and neighbourhoods where architecture, community and everyday life sit comfortably together.') }}</p>
                 <a class="link" href="{{ route('about', ['locale' => $locale]) }}">{{ __('Read our story') }}</a>
             </div>
         </div>
@@ -135,7 +136,7 @@
 <section class="section">
     <div class="wrap overlap">
         <div class="overlap-media">
-            <img src="{{ $about?->image_right ? asset('storage/'.$about->image_right) : asset('assets/img/brand/interior.webp') }}" alt="{{ __('Living room in a Rest Developments apartment') }}" loading="lazy" decoding="async" width="1280" height="880">
+            <img src="{{ asset('assets/img/brand/interior.webp') }}" alt="{{ __('Living room in a Rest Developments apartment') }}" loading="lazy" decoding="async" width="1280" height="880">
         </div>
         <div class="overlap-panel">
             <span class="kicker">{{ __('Life at Rest') }}</span>

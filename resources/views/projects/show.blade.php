@@ -23,7 +23,7 @@
         <div class="framed">@if($project->image)<img src="{{ asset('storage/'.$project->image) }}" alt="{{ $tr?->title }}" width="960" height="720" decoding="async" fetchpriority="high">@endif</div>
         <div>
             <span class="kicker">{{ __('About the project') }}</span>
-            <div class="prose" style="font-size:1.05rem">{!! nl2br(e(strip_tags($tr?->description ?? ''))) !!}</div>
+            <div class="prose" style="font-size:1.05rem">{!! nl2br(e(trim(preg_replace('/\n\s*\n+/', "\n", str_replace("\r", '', strip_tags($tr?->description ?? '')))))) !!}</div>
             @if($facts)
                 <dl class="facts">
                     @foreach($facts as $label => $value)<div class="fact"><dt>{{ $label }}</dt><dd>{{ $value }}</dd></div>@endforeach

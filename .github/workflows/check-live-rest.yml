@@ -1,4 +1,5 @@
 name: Check live Rest theme
+# rerun after polish
 on:
   push:
     branches: [redesign/rest-signature]
@@ -15,7 +16,7 @@ jobs:
           set -euo pipefail
           for path in /en/ /en/projects /en/about /en/contact /en/blog /en/careers /fa/; do
             code=$(curl -sL -o /tmp/page.html -w '%{http_code}' "https://restdevelopments.com$path")
-            echo "$path HTTP $code popup $(grep -c 'welcome-panel' /tmp/page.html || true)"
+            echo "$path HTTP $code popup $(grep -c welcome-panel /tmp/page.html || true) size $(wc -c < /tmp/page.html)"
           done
           curl -sf https://restdevelopments.com/assets/css/heritage.css | grep -c 'rest-logo-mask'
           for a in assets/fonts/dmsans-var.woff assets/fonts/cardo-regular.woff assets/img/brand/rest-logo-mask.png assets/img/brand/welcome.webp; do

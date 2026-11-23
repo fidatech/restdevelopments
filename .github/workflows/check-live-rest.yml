@@ -1,0 +1,50 @@
+name: Check live Rest theme
+on:
+  push:
+    branches: [redesign/rest-signature]
+    paths: [.github/workflows/check-live-rest.yml]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Pages, assets and screenshots
+        run: |
+          set -euo pipefail
+          for path in /en/ /en/projects /en/about /en/contact /en/blog /en/careers /fa/; do
+            code=$(curl -sL -o /tmp/page.html -w '%{http_code}' "https://restdevelopments.com$path")
+            echo "$path HTTP $code popup $(grep -c 'welcome-panel' /tmp/page.html || true)"
+          done
+          curl -sf https://restdevelopments.com/assets/css/heritage.css | grep -c 'rest-logo-mask'
+          for a in assets/fonts/dmsans-var.woff assets/fonts/cardo-regular.woff assets/img/brand/rest-logo-mask.png assets/img/brand/welcome.webp; do
+            echo "$a $(curl -s -o /dev/null -w '%{http_code}' https://restdevelopments.com/$a)"
+          done
+          mkdir -p shots && cd shots && npm init -y >/dev/null && npm i --silent playwright@1.48.2 >/dev/null && npx playwright install chromium >/dev/null
+          cat > shoot.mjs <<'JS'
+          import { chromium } from 'playwright';
+          const b = await chromium.launch();
+          const run = async (name, w, h, url, popup) => {
+            const ctx = await b.newContext({ viewport: { width: w, height: h } });
+            const p = await ctx.newPage();
+            const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => m.type() === 'error' && errs.push(m.text()));
+            if (!popup) await p.addInitScript(() => sessionStorage.setItem('restWelcomeShown', '1'));
+            await p.goto(url, { waitUntil: 'networkidle' });
+            if (!popup) { for (let y = 0; y < 12000; y += 700) { await p.evaluate(v => scrollTo(0, v), y); await p.waitForTimeout(200); } await p.evaluate(() => scrollTo(0, 0)); }
+            await p.waitForTimeout(1500);
+            await p.screenshot({ path: name + '.png', fullPage: !popup });
+            console.log(name, JSON.stringify(errs));
+            await ctx.close();
+          };
+          await run('home-desktop', 1440, 900, 'https://restdevelopments.com/en/', false);
+          await run('home-popup', 1440, 900, 'https://restdevelopments.com/en/', true);
+          await run('home-mobile', 390, 844, 'https://restdevelopments.com/en/', false);
+          await run('projects-desktop', 1440, 900, 'https://restdevelopments.com/en/projects', false);
+          await b.close();
+          JS
+          node shoot.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: live-screenshots
+          path: shots/*.png

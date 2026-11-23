@@ -5,19 +5,21 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
-  <div class="page-header card-soft is-inline">
+<div class="page-header card-soft is-inline">
     <div class="page-header-main">
         <span class="page-header-icon"><x-icon name="images" /></span>
         <div class="page-header-text">
-            <h1>Slider Management</h1>
+            <h1>Sliders</h1>
             <p class="page-header-sub">Craft premium, high-impact sliders for your website.</p>
         </div>
     </div>
     <div class="page-header-actions"><a href="{{ route('admin.sliders.create') }}" class="btn btn-primary">
         <x-icon name="plus" class="me-2" /> Create Slider
-      </a>
-    </div>
+      </a></div>
+</div>
+<div class="container-fluid">
+  <div class="card page-card">
+    
 
     <div class="card-body p-4">
       @if($sliders->count())
@@ -62,8 +64,9 @@
                       </a>
                       <button class="btn-icon delete btn-delete" data-url="{{ route('admin.sliders.destroy', $s) }}" title="Delete">
                         <x-icon name="trash" />
-                      </button></div>
-</div>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
               </div>

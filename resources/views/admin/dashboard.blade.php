@@ -78,29 +78,28 @@
 </div>
 
 <div class="row g-3 mb-3">
-    <div class="col-12 col-xl-7">
+    <div class="col-12 col-xl-8">
         <div class="card h-100 mb-0">
             <div class="card-header"><h2 class="h5 card-title mb-0">Latest projects</h2><a class="btn btn-sm btn-light-secondary" href="{{ route('admin.projects.index') }}">All projects</a></div>
             <div class="card-body p-0">
                 <table class="table table-hover mb-0 keep-table">
-                    <thead><tr><th>Project</th><th>Location</th><th>Status</th><th class="text-end">Open</th></tr></thead>
+                    <thead><tr><th>Project</th><th>Status</th><th class="text-end">Open</th></tr></thead>
                     <tbody>
                         @forelse ($projects as $p)
                             <tr>
                                 <td><div class="d-flex align-items-center gap-2">@if ($p->image)<img class="recent-thumb" src="{{ asset(str_starts_with($p->image, 'storage/') ? $p->image : 'storage/'.$p->image) }}" alt="">@else<span class="recent-thumb d-inline-block"></span>@endif<span class="fw-semibold">{{ \Illuminate\Support\Str::limit($p->t()?->title, 48) }}</span></div></td>
-                                <td>{{ $p->location ?: '—' }}</td>
                                 <td>@if ($p->status)<span class="badge bg-success-subtle text-success-emphasis">{{ $p->state === 'ongoing' ? 'Under construction' : ucfirst($p->state ?? '') }}</span>@else<span class="badge bg-secondary-subtle text-secondary-emphasis">Hidden</span>@endif</td>
                                 <td class="text-end"><div class="act-group"><x-act kind="view" :href="route('projects.show', ['locale' => 'en', 'slug' => $p->slug])" blank /><a class="btn btn-sm btn-light-secondary" href="{{ url('admin/projects/'.$p->id.'/gallery') }}">Gallery</a></div></td>
                             </tr>
                         @empty
-                            <tr><td colspan="4" class="text-center text-muted py-4">No projects yet.</td></tr>
+                            <tr><td colspan="3" class="text-center text-muted py-4">No projects yet.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    <div class="col-12 col-xl-5">
+    <div class="col-12 col-xl-4">
         <div class="card h-100 mb-0 dc-wait">
             <div class="card-header"><h2 class="h5 card-title mb-0">To finish</h2>@if ($checks->count())<span class="badge bg-warning text-dark">{{ $checks->count() }}</span>@endif</div>
             <div class="card-body">

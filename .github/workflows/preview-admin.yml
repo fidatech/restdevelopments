@@ -1,5 +1,5 @@
 name: Preview admin panel on the server
-# rerun 3
+# rerun 4
 on:
   push:
     branches: [redesign/rest-signature]
@@ -52,7 +52,7 @@ jobs:
           import { chromium } from 'playwright';
           const pages = process.argv.slice(2);
           const b = await chromium.launch();
-          for (const [name, w, h] of [['dashboard',1440,900],['projects',1440,900],['sliders',1440,900],['blogs',1440,900],['contact',1440,900],['login',1440,900],['dashboard-m',390,844],['projects-m',390,844]]) {
+          for (const [name, w, h] of [['dashboard',1440,900],['sliders',1440,900],['slider-edit',1440,900],['about-settings',1440,900],['team-create',1440,900],['careers',1440,900],['units',1440,900],['contact',1440,900],['login',1440,900],['dashboard-m',390,844],['login-m',390,844]]) {
             const file = name.replace(/-m$/, '');
             const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: w > 500 ? 0.5 : 1 });
             const p = await ctx.newPage();

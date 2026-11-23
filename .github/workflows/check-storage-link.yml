@@ -1,0 +1,55 @@
+name: Check storage link and links without /public
+on:
+  push:
+    branches: [redesign/rest-signature]
+    paths: [.github/workflows/check-storage-link.yml]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HOST: awt-c8-us.afgnoc.com
+    steps:
+      - name: Images through the link; put the folder back if they fail
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+        run: |
+          set -eu
+          umask 077
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/k"
+          ssh-keyscan -T 10 -t ed25519 "$HOST" > "$RUNNER_TEMP/kh"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/kh" | awk '{print $2}')" = "$FINGERPRINT"
+          ssh -i "$RUNNER_TEMP/k" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/kh" "restdevelopments@$HOST" bash -s <<'SH'
+          set -eu
+          cd /home/restdevelopments/public_html
+          ls -la public | grep storage || true
+          find storage/app/public -type f \( -name '*.webp' -o -name '*.jpg' -o -name '*.png' \) > /tmp/rest-files.txt
+          echo "files in storage/app/public: $(wc -l < /tmp/rest-files.txt)"
+          bad=0; n=0
+          for f in $(sed -n '1p;40p;80p;120p;160p' /tmp/rest-files.txt); do
+            rel=${f#storage/app/public/}
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://restdevelopments.com/storage/$rel")
+            echo "/storage/$rel HTTP $code"; n=$((n+1)); [ "$code" = 200 ] || bad=$((bad+1))
+          done
+          rm -f /tmp/rest-files.txt
+          if [ "$n" -gt 0 ] && [ "$bad" -gt 0 ] && [ -L public/storage ]; then
+            old=$(ls -d public/storage.before-link-* | tail -1)
+            rm public/storage && mv "$old" public/storage
+            echo "Images failed through the link; the folder is back as it was"; exit 1
+          fi
+          echo "Images are served through the storage link."
+          SH
+      - name: Live pages have no /public links and their images load
+        run: |
+          set -eu
+          for path in /en/ /en/projects /en/about /en/blog /fa/; do
+            curl -sL -o /tmp/p.html "https://restdevelopments.com$path"
+            n=$(grep -c 'restdevelopments.com/public' /tmp/p.html || true)
+            echo "$path links with /public: $n"
+            test "$n" = 0
+            for i in $(grep -o 'https://restdevelopments.com/storage/[^"?]*' /tmp/p.html | sort -u | head -4); do printf '  %s ' "$i"; curl -s -o /dev/null -w '%{http_code}\n' "$i"; done
+          done
+          for u in /public/admin/blogs /admin/blogs /login; do printf '%s ' "$u"; curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' "https://restdevelopments.com$u"; done

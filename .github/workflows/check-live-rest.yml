@@ -40,12 +40,11 @@ jobs:
             await ctx.close();
           };
           await run('home-desktop', 1440, 900, 'https://restdevelopments.com/en/', false);
-          await run('home-popup', 1440, 900, 'https://restdevelopments.com/en/', true);
           await run('home-mobile', 390, 844, 'https://restdevelopments.com/en/', false);
-          await run('projects-desktop', 1440, 900, 'https://restdevelopments.com/en/projects', false);
           await run('project-desktop', 1440, 900, 'https://restdevelopments.com/en/projects/business-office-spaces-at-rest-complex-termiz', false);
-          await run('about-desktop', 1440, 900, 'https://restdevelopments.com/en/about', false);
-          await run('popup-mobile', 390, 844, 'https://restdevelopments.com/en/', true);
+          await run('projects-desktop', 1440, 900, 'https://restdevelopments.com/en/projects', false);
           await b.close();
           JS
           node shoot.mjs
+
+# emaar check

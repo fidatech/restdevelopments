@@ -2,6 +2,14 @@
 @section('title', 'Edit Slider')
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="images" /></span>
+        <div class="page-header-text">
+            <h1>Edit Slider</h1>
+        </div>
+    </div>
+</div>
     <div class="container-fluid">
         <form id="sliderEditForm" method="post" action="{{ route('admin.sliders.update', $slider) }}" enctype="multipart/form-data" novalidate>
             @csrf @method('PUT')

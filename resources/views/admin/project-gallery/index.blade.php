@@ -3,42 +3,30 @@
 
 @section('vendor-style')
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<style>
-    :root { --pri: 120,75,155; --gold:195,155,110; --ink:30,30,45; --cream:248,245,242; --danger:200,70,85; --r-card:18px; --sh-sm:0 6px 20px rgba(0,0,0,.06); }
-    body { background: rgb(var(--cream)); }
-    .page-card { border:0; border-radius:var(--r-card); background:#fff; box-shadow:var(--sh-sm); overflow:hidden; }
-    .page-card .card-header { background:linear-gradient(135deg, rgba(var(--pri),.10), rgba(var(--gold),.08)); border-bottom:1px dashed rgba(0,0,0,.08); padding:1rem 1.25rem; }
-    .btn-premium{ border:0;border-radius:999px;padding:.6rem 1.2rem;font-weight:600;background:linear-gradient(135deg,rgb(var(--pri)),rgba(var(--pri),.92));color:#fff;}
-    .btn-toggle-form{ background:linear-gradient(135deg, rgba(var(--gold),.9), rgba(var(--gold),.8)); color:#fff; border:0; border-radius:999px; padding:.6rem 1.2rem; font-weight:600;}
-    .form-container{transition:all .3s ease;margin-bottom:20px;}
-    .form-container.collapsed{height:0;overflow:hidden;opacity:0;margin-bottom:0;}
-    .table-container{transition:all .3s ease;}
-    .table-container.collapsed{height:0;overflow:hidden;opacity:0;}
-    .upload-tile{border:1px dashed rgba(0,0,0,.2);border-radius:14px;padding:1rem;background:linear-gradient(135deg,#fbf8f4,#f4efe9);}
-</style>
 @endsection
 
 @section('content')
 <div class="container-fluid">
-  <div class="card page-card mb-3">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <div>
-        <h2 class="mb-0">Gallery for: {{ $project->translations()->where('locale', app()->getLocale())->first()->title }}</h2>
-        <small class="text-muted">Upload interior/exterior images (recommended 1200×660 webp)</small>
-      </div>
-      <button class="btn btn-toggle-form" id="toggleFormBtn">
-        <i class="fas fa-plus me-1"></i> Add New Image
-      </button>
+  <div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="images" /></span>
+        <div class="page-header-text">
+            <h1>Gallery for: {{ $project->translations()->where('locale', app()->getLocale())->first()->title }}</h1>
+            <p class="page-header-sub">Upload interior/exterior images (recommended 1200×660 webp)</p>
+        </div>
     </div>
-  </div>
+    <div class="page-header-actions"><button class="btn btn-primary" id="toggleFormBtn">
+        <x-icon name="plus" class="me-1" /> Add New Image
+      </button></div>
+</div>
 
   {{-- Form --}}
   <div class="form-container collapsed" id="formContainer">
     <div class="card page-card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0" id="formTitle">Add Image</h5>
-        <button class="btn btn-sm btn-outline-secondary rounded-pill d-none" id="btnCancelEdit">
-          <i class="fas fa-rotate-left me-1"></i> Cancel Edit
+        <button class="btn btn-sm btn-light-secondary d-none" id="btnCancelEdit">
+          <x-icon name="rotate-left" class="me-1" /> Cancel Edit
         </button>
       </div>
       <div class="card-body">
@@ -68,8 +56,8 @@
           </div>
 
           <div class="d-grid mt-3">
-            <button class="btn btn-premium" type="submit" id="saveBtn">
-              <i class="fas fa-save me-2"></i> Save Image
+            <button class="btn btn-primary" type="submit" id="saveBtn">
+              <x-icon name="floppy-disk" class="me-2" /> Save Image
             </button>
           </div>
         </form>
@@ -85,7 +73,7 @@
         <small class="text-muted">Edit / delete. Order controls display sequence.</small>
       </div>
       <div class="card-body">
-        <table id="galTable" class="table table-striped table-bordered w-100">
+        <table id="galTable" class="table table-striped table-hover w-100">
           <thead>
             <tr>
               <th>#</th>

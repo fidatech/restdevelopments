@@ -2,14 +2,20 @@
 @section('title', 'Why Choose Us – Items')
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="award" /></span>
+        <div class="page-header-text">
+            <h1>Why Choose Us – Items</h1>
+        </div>
+    </div>
+    <div class="page-header-actions"><a href="{{ route('admin.items.create') }}" class="btn btn-sm btn-primary">Add New</a></div>
+</div>
     <div class="container-fluid">
         <div class="card page-card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Items</h5>
-                <a href="{{ route('admin.items.create') }}" class="btn btn-sm btn-primary">Add New</a>
-            </div>
+            
             <div class="card-body table-responsive">
-                <table class="table-bordered table">
+                <table class="table-hover table">
                     <thead>
                         <tr>
                             <th>Order</th>
@@ -23,11 +29,9 @@
                                 <td>{{ $item->order }}</td>
                                 <td>{{ $item->t()?->title }}</td>
                                 <td>
-                                    <a href="{{ route('admin.items.edit', $item) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="{{ route('admin.items.edit', $item) }}" class="btn-act is-amber" title="Edit" aria-label="Edit"><x-icon name="pen" /></a>
 
-                                    <button data-url="{{ route('admin.items.destroy', $item) }}" class="btn btn-sm btn-danger btn-delete-item">
-                                        Delete
-                                    </button>
+                                    <button type="button" data-url="{{ route('admin.items.destroy', $item) }}" class="btn-act is-red btn-delete-item" title="Delete" aria-label="Delete"><x-icon name="trash" /></button>
                                 </td>
 
                             </tr>

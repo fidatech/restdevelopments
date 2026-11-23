@@ -2,11 +2,17 @@
 @section('title', $client->exists ? 'Edit Client Logo' : 'Create Client Logo')
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="handshake" /></span>
+        <div class="page-header-text">
+            <h1>{{ $client->exists ? 'Edit' : 'Create' }} Client Logo</h1>
+        </div>
+    </div>
+</div>
 <div class="container-fluid">
     <div class="card page-card">
-        <div class="card-header">
-            <h5 class="mb-0">{{ $client->exists ? 'Edit' : 'Create' }}</h5>
-        </div>
+        
         <div class="card-body">
             <form id="clientForm"
                 action="{{ $client->exists ? route('admin.clients.update',$client) : route('admin.clients.store') }}"

@@ -2,20 +2,26 @@
 @section('title','Contact Settings')
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="address-book" /></span>
+        <div class="page-header-text">
+            <h1>Contact Settings</h1>
+        </div>
+    </div>
+</div>
 <div class="container-fluid">
 
     <form id="contactForm" class="card page-card" method="POST" action="{{ route('admin.contact.update') }}" enctype="multipart/form-data">
         @csrf
 
-        <div class="card-header">
-            <h5 class="mb-0">Contact Settings</h5>
-        </div>
+        
         <div class="card-body">
 
             {{-- ========== CONTACT INFO ========= --}}
             <div class="form-section mb-5">
                 <h6 class="section-title d-flex align-items-center">
-                    <i class="fas fa-address-book me-2"></i>
+                    <x-icon name="address-book" class="me-2" />
                     <span>Contact Information</span>
                 </h6>
                 <div class="row g-4">
@@ -49,7 +55,7 @@
             {{-- ========== SOCIAL ========= --}}
             <div class="form-section mb-5">
                 <h6 class="section-title d-flex align-items-center">
-                    <i class="fas fa-share-alt me-2"></i>
+                    <x-icon name="share-nodes" class="me-2" />
                     <span>Social Links</span>
                 </h6>
                 <div class="row g-4">
@@ -99,7 +105,7 @@
             {{-- ========== LOGOS ========= --}}
             <div class="form-section mb-5">
                 <h6 class="section-title d-flex align-items-center">
-                    <i class="fas fa-images me-2"></i>
+                    <x-icon name="images" class="me-2" />
                     <span>Logos</span>
                 </h6>
                 <div class="row g-4">
@@ -110,14 +116,14 @@
                                 <div class="file-upload-wrapper">
                                     <input type="file" name="logo_dark" class="form-control" id="logoDark">
                                     <label for="logoDark" class="file-upload-label btn btn-outline-primary">
-                                        <i class="fas fa-cloud-upload-alt me-2"></i>Choose File
+                                        <x-icon name="cloud-arrow-up" class="me-2" />Choose File
                                     </label>
                                 </div>
                                 @if($setting->logo_dark)
                                 <div class="logo-preview ms-3">
                                     <img src="{{ asset('storage/'.$setting->logo_dark) }}" height="50" class="rounded border">
                                     <a href="{{ asset('storage/'.$setting->logo_dark) }}" target="_blank" class="preview-link">
-                                        <i class="fas fa-eye"></i>
+                                        <x-icon name="eye" />
                                     </a>
                                 </div>
                                 @endif
@@ -131,14 +137,14 @@
                                 <div class="file-upload-wrapper">
                                     <input type="file" name="logo_white" class="form-control" id="logoWhite">
                                     <label for="logoWhite" class="file-upload-label btn btn-outline-primary">
-                                        <i class="fas fa-cloud-upload-alt me-2"></i>Choose File
+                                        <x-icon name="cloud-arrow-up" class="me-2" />Choose File
                                     </label>
                                 </div>
                                 @if($setting->logo_white)
                                 <div class="logo-preview ms-3">
                                     <img src="{{ asset('storage/'.$setting->logo_white) }}" height="50" class="rounded border bg-dark p-1">
                                     <a href="{{ asset('storage/'.$setting->logo_white) }}" target="_blank" class="preview-link">
-                                        <i class="fas fa-eye"></i>
+                                        <x-icon name="eye" />
                                     </a>
                                 </div>
                                 @endif
@@ -151,7 +157,7 @@
             {{-- ========== MAP ========= --}}
             <div class="form-section mb-5">
                 <h6 class="section-title d-flex align-items-center">
-                    <i class="fas fa-map-marked-alt me-2"></i>
+                    <x-icon name="map-location-dot" class="me-2" />
                     <span>Map Embed</span>
                 </h6>
                 <div class="form-floating">
@@ -164,14 +170,14 @@
             {{-- ========== TRANSLATIONS ========= --}}
             <div class="form-section">
                 <h6 class="section-title d-flex align-items-center">
-                    <i class="fas fa-language me-2"></i>
+                    <x-icon name="language" class="me-2" />
                     <span>Translations</span>
                 </h6>
                 <ul class="nav nav-tabs" id="translationTabs" role="tablist">
                     @foreach($locales as $i=>$loc)
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link {{ $i===0?'active':'' }}" id="{{ $loc }}-tab" data-toggle="tab" data-target="#tab-{{ $loc }}" type="button" role="tab">
-                                <i class="fas fa-globe me-1"></i>{{ strtoupper($loc) }}
+                            <button class="nav-link {{ $i===0?'active':'' }}" id="{{ $loc }}-tab" data-bs-toggle="tab" data-bs-target="#tab-{{ $loc }}" type="button" role="tab">
+                                <x-icon name="globe" class="me-1" />{{ strtoupper($loc) }}
                             </button>
                         </li>
                     @endforeach
@@ -198,7 +204,7 @@
 
             <div class="d-flex justify-content-end mt-4">
                 <button type="submit" class="btn btn-primary btn-lg px-4">
-                    <i class="fas fa-save me-2"></i>Save Settings
+                    <x-icon name="floppy-disk" class="me-2" />Save Settings
                 </button>
             </div>
         </div>
@@ -233,97 +239,4 @@ $('#contactForm').on('submit', async function(e){
 @endsection
 
 @section('styles')
-<style>
-    .form-section {
-        margin-bottom: 2.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid #eee;
-    }
-
-    .section-title {
-        color: #3a3a3a;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #dee2e6;
-    }
-
-    .form-floating > label {
-        padding: 1rem 1.25rem;
-    }
-
-    .input-group-text {
-        min-width: 45px;
-        justify-content: center;
-    }
-
-    .bg-facebook { background-color: #3b5998 !important; }
-    .bg-twitter { background-color: #1da1f2 !important; }
-    .bg-linkedin { background-color: #0077b5 !important; }
-    .bg-instagram { background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d) !important; }
-    .bg-youtube { background-color: #ff0000 !important; }
-
-    .file-upload-card {
-        background: #f8f9fa;
-        padding: 1.25rem;
-        border-radius: 0.5rem;
-        border: 1px dashed #dee2e6;
-    }
-
-    .file-upload-wrapper {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .file-upload-wrapper input[type="file"] {
-        position: absolute;
-        left: 0;
-        top: 0;
-        opacity: 0;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-    }
-
-    .file-upload-label {
-        margin-bottom: 0;
-        white-space: nowrap;
-    }
-
-    .logo-preview {
-        position: relative;
-    }
-
-    .preview-link {
-        position: absolute;
-        right: -10px;
-        top: -10px;
-        background: white;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        color: #333;
-    }
-
-    .nav-tabs .nav-link {
-        border: none;
-        color: #6c757d;
-        font-weight: 500;
-        padding: 0.75rem 1.5rem;
-    }
-
-    .nav-tabs .nav-link.active {
-        color: #0d6efd;
-        border-bottom: 3px solid #0d6efd;
-        background: transparent;
-    }
-
-    .tab-content {
-        background: #f8f9fa;
-    }
-</style>
 @endsection

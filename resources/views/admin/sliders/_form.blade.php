@@ -1,72 +1,4 @@
-<style>
-  :root{
-    --pri: 120,75,155;        /* deep purple */
-    --gold: 195,155,110;      /* soft gold */
-    --ink: 30,30,45;          /* dark slate */
-    --ok: 37,160,110;         /* premium green */
-    --danger: 200,70,85;      /* rose red */
-  }
-  .form-wrap{
-    border:0; border-radius:18px; background:#fff;
-    box-shadow:0 6px 20px rgba(0,0,0,.06); overflow:hidden;
-  }
-  .form-head{
-    background: linear-gradient(135deg, rgba(var(--pri),.10), rgba(var(--gold),.08));
-    border-bottom:1px dashed rgba(0,0,0,.08);
-    padding:1rem 1.25rem; margin-bottom:1rem;
-  }
-  .form-title{ margin:0; font-weight:700; color:rgb(var(--ink)); }
-  .pane{
-    border:1px solid rgba(0,0,0,.06); border-radius:16px; background:#fff;
-    box-shadow:0 6px 16px rgba(0,0,0,.05);
-  }
-  .pane-head{
-    padding:.9rem 1rem; border-bottom:1px dashed rgba(0,0,0,.08);
-    background: linear-gradient(135deg, rgba(var(--pri),.05), rgba(var(--gold),.04));
-    border-top-left-radius:16px; border-top-right-radius:16px;
-    font-weight:700; color:rgb(var(--ink));
-  }
-  .pane-body{ padding:1rem; }
 
-  /* status toggle */
-  .status-toggle{ display:flex; gap:.5rem; }
-  .status-toggle input{ display:none; }
-  .status-pill{
-    padding:.45rem .9rem; border-radius:999px; cursor:pointer; user-select:none;
-    border:1px solid rgba(0,0,0,.08); background:#fff; color:rgba(var(--ink),.8); font-weight:600;
-    transition:all .15s ease;
-  }
-  .status-toggle input:checked + .status-pill.published{
-    background: rgba(var(--ok),.12); color: rgb(var(--ok)); border-color: rgba(var(--ok),.35);
-  }
-  .status-toggle input:checked + .status-pill.draft{
-    background: rgba(var(--gold),.20); color: rgb(var(--ink)); border-color: rgba(var(--gold),.45);
-  }
-
-  /* upload tiles */
-  .upload-tile{
-    border:1px dashed rgba(0,0,0,.2); border-radius:14px; padding:1rem;
-    background: linear-gradient(135deg, #fbf8f4, #f4efe9);
-  }
-  .upload-label{ font-weight:700; color:rgb(var(--ink)); margin-bottom:.35rem; }
-  .upload-help{ color:rgba(var(--ink),.6); font-size:.85rem; }
-  .upload-input{ display:block; margin-top:.6rem; }
-  .preview{
-    margin-top:.75rem; border-radius:12px; overflow:hidden; background:#f6f6f8;
-    border:1px solid rgba(0,0,0,.06);
-  }
-  .preview.ratio{ --bs-aspect-ratio: 56.25%; } /* 16:9 */
-  .preview img{ width:100%; height:100%; object-fit:cover; }
-
-  /* save button */
-  .btn-premium{
-    border:0; border-radius:999px; padding:.7rem 1.25rem; font-weight:700; letter-spacing:.2px;
-    background: linear-gradient(135deg, rgb(var(--pri)), rgba(var(--pri),.92)); color:#fff;
-    box-shadow: 0 10px 22px rgba(var(--pri), .25);
-    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
-  }
-  .btn-premium:hover{ transform: translateY(-2px); filter: brightness(1.02); box-shadow: 0 14px 26px rgba(var(--pri), .3); }
-</style>
 
 <div class="row g-4">
   <!-- LEFT: Translations / Content -->
@@ -151,7 +83,7 @@
                  class="form-control" placeholder="https://...">
         </div>
 
-        <button class="btn btn-premium w-100">Save</button>
+        <button class="btn btn-primary w-100">Save</button>
       </div>
     </div>
   </div>

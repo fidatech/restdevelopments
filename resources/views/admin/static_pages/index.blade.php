@@ -2,23 +2,29 @@
 @section('title', 'Static Pages')
 
 @section('vendor-style')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
 @endsection
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="file-lines" /></span>
+        <div class="page-header-text">
+            <h1>Static Pages</h1>
+        </div>
+    </div>
+</div>
     <div class="container-fluid">
 
         <div class="card page-card">
-            <div class="card-header">
-                <h5 class="mb-0">Static Pages</h5>
-            </div>
+            
             <div class="card-body">
 
                 <!-- MAIN PAGE TABS -->
                 <ul class="nav nav-tabs" id="pageTab" role="tablist">
-                    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tab-terms">Terms of Service</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-privacy">Privacy Policy</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tab-cookies">Cookies Policy</a></li>
+                    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-terms">Terms of Service</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-privacy">Privacy Policy</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-cookies">Cookies Policy</a></li>
                 </ul>
 
                 <div class="tab-content pt-3">
@@ -54,7 +60,7 @@
 @endsection
 
 @section('page-script')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // attach csrf

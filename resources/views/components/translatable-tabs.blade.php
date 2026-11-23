@@ -11,7 +11,7 @@
     <li class="nav-item">
       <a
         class="nav-link {{ $i===0 ? 'active' : '' }}"
-        data-toggle="tab"                   {{-- BS4 attribute --}}
+        data-bs-toggle="tab"
         href="#{{ $prefix }}_{{ $loc }}"    {{-- BS4 uses href, not data-bs-target --}}
         role="tab"
         aria-controls="{{ $prefix }}_{{ $loc }}"

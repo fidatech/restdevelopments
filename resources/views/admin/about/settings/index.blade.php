@@ -3,30 +3,22 @@
 
 @section('vendor-style')
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<style>
-  :root{ --pri:120,75,155; --gold:195,155,110; --ink:30,30,45; --cream:248,245,242; }
-  body{ background: rgb(var(--cream)); }
-  .page-card{ border:0; border-radius:18px; background:#fff; box-shadow:0 6px 20px rgba(0,0,0,.06); overflow:hidden;}
-  .page-card .card-header{ background:linear-gradient(135deg, rgba(var(--pri),.10), rgba(var(--gold),.08)); border-bottom:1px dashed rgba(0,0,0,.08); padding:1.1rem 1.25rem;}
-  .btn-premium{ border:0; border-radius:999px; padding:.6rem 1.2rem; font-weight:600; background:linear-gradient(135deg, rgb(var(--pri)), rgba(var(--pri),.92)); color:#fff; box-shadow:0 10px 22px rgba(var(--pri), .25);}
-  .pane{ border:1px solid rgba(0,0,0,.06); border-radius:16px; background:#fff; box-shadow:0 6px 16px rgba(0,0,0,.05); }
-  .pane-head{ padding:.9rem 1rem; border-bottom:1px dashed rgba(0,0,0,.08); background:linear-gradient(135deg, rgba(var(--pri),.05), rgba(var(--gold),.04)); border-radius:16px 16px 0 0; font-weight:700;}
-  .pane-body{ padding:1rem;}
-  .preview{ border:1px solid rgba(0,0,0,.06); border-radius:12px; overflow:hidden; background:#f6f6f8;}
-  .preview img{ width:100%; height:100%; object-fit:cover; }
-</style>
 @endsection
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="circle-info" /></span>
+        <div class="page-header-text">
+            <h1>About Settings</h1>
+            <p class="page-header-sub">Controls Home “About” section and the About page intro.</p>
+        </div>
+    </div>
+</div>
 @php $default = config('app.fallback_locale', 'en'); @endphp
 <div class="container-fluid">
   <div class="card page-card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <div>
-        <h4 class="mb-0">About Settings</h4>
-        <small class="text-muted">Controls Home “About” section and the About page intro.</small>
-      </div>
-    </div>
+    
     <div class="card-body">
       <form id="aboutSettingsForm" method="post" action="{{ route('admin.about.settings.store') }}" enctype="multipart/form-data">
         @csrf
@@ -38,7 +30,7 @@
                 <ul class="nav nav-tabs" role="tablist">
                   @foreach($locales as $i=>$loc)
                   <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ $i===0?'active':'' }}" id="tab-{{ $loc }}-tab" data-toggle="tab" data-target="#tab-{{ $loc }}" type="button" role="tab" aria-controls="tab-{{ $loc }}" aria-selected="{{ $i===0?'true':'false' }}">{{ strtoupper($loc) }}</button>
+                    <button class="nav-link {{ $i===0?'active':'' }}" id="tab-{{ $loc }}-tab" data-bs-toggle="tab" data-bs-target="#tab-{{ $loc }}" type="button" role="tab" aria-controls="tab-{{ $loc }}" aria-selected="{{ $i===0?'true':'false' }}">{{ strtoupper($loc) }}</button>
                   </li>
                   @endforeach
                 </ul>
@@ -130,7 +122,7 @@
               </div>
             </div>
 
-            <button class="btn btn-premium w-100"><i class="fas fa-save me-2"></i>Save</button>
+            <button class="btn btn-primary w-100"><x-icon name="floppy-disk" class="me-2" />Save</button>
           </div>
         </div>
       </form>

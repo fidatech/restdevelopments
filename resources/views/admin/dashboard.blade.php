@@ -1,241 +1,147 @@
 @extends('admin.layouts.master')
-
 @section('title', 'Dashboard')
 
-@section('page-style')
-    <link rel="stylesheet" href="{{ asset('admin/app-assets/vendors/css/charts/chartist.css') }}">
-    <link rel="stylesheet" href="{{ asset('admin/app-assets/css/pages/dashboard-analytics.css') }}">
-@endsection
+@php
+    $me = auth()->user();
+    $now = now();
+    $hour = (int) $now->format('G');
+    $greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good evening');
+    $initials = collect(preg_split('/\s+/', trim($me->name ?? 'A')))->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
+    $count = fn (string $model, ?callable $scope = null) => rescue(fn () => ($scope ? $scope($model::query()) : $model::query())->count(), 0, false);
+
+    $tiles = [
+        ['Projects', 'building', $count(\App\Models\Project::class), route('admin.projects.index'), 'primary'],
+        ['Live sliders', 'images', $count(\App\Models\Slider::class, fn ($q) => $q->where('status', 'published')), route('admin.sliders.index'), 'success'],
+        ['Blog posts', 'newspaper', $count(\App\Models\Blog::class), route('admin.blogs.index'), 'warning'],
+        ['Open vacancies', 'user-tie', $count(\App\Models\Vacancy::class), route('admin.careers.index'), 'danger'],
+        ['Team members', 'users', $count(\App\Models\Team::class), route('admin.team.index'), 'primary'],
+        ['Client logos', 'handshake', $count(\App\Models\Client::class), route('admin.clients.index'), 'success'],
+    ];
+    $projects = rescue(fn () => \App\Models\Project::with('translations')->orderByDesc('created_at')->take(6)->get(), collect(), false);
+    $posts = rescue(fn () => \App\Models\Blog::with('translations')->orderByDesc('created_at')->take(5)->get(), collect(), false);
+    $checks = collect();
+    foreach ($projects as $p) {
+        if (! $p->image) $checks->push(['Add a main image to “'.($p->t()?->title ?? 'a project').'”', url('admin/projects'), 'warning']);
+        if (! $p->price_starts_from) $checks->push(['Add “Prices from” to “'.($p->t()?->title ?? 'a project').'”', url('admin/projects'), 'info']);
+    }
+    $checks = $checks->take(5);
+@endphp
 
 @section('content')
-    <div class="content-wrapper-before"></div>
-    <div class="content-header row"></div>
+<x-page-header title="Dashboard" icon="gauge-high" subtitle="Rest Developments website">
+    <a class="btn btn-outline-soft" href="{{ url('/') }}" target="_blank" rel="noopener"><x-icon name="globe" class="me-1" /> View website</a>
+    <a class="btn btn-primary" href="{{ route('admin.projects.index') }}"><x-icon name="plus" class="me-1" /> New project</a>
+</x-page-header>
 
-    <div class="container-fluid">
-    <div class="row g-3">
-      <div class="col-md-3"><div class="card shadow-sm p-3">Total Projects</div></div>
-      <div class="col-md-3"><div class="card shadow-sm p-3">Total Properties</div></div>
-      <div class="col-md-3"><div class="card shadow-sm p-3">Leads</div></div>
-      <div class="col-md-3"><div class="card shadow-sm p-3">Published Posts</div></div>
+<section class="dash-top" aria-label="Rest Developments">
+    <div class="dash-id">
+        <span class="dash-id-avatar" aria-hidden="true">{{ $initials }}</span>
+        <div class="min-w-0">
+            <p class="dash-id-greeting">{{ $greeting }},</p>
+            <h2 class="dash-id-user">{{ $me->name }}</h2>
+            <ul class="dash-id-facts">
+                <li><x-icon name="envelope" /> {{ $me->email }}</li>
+            </ul>
+        </div>
     </div>
-  </div>
-    <!--/ eCommerce & Project statistic -->
-    {{-- STATISTICS WITH GRADIENT BACKGROUND COLOR --}}
-    {{-- <div class="row match-height">
-        @php
-            $stats = [
-                ['title' => 'Total Orders', 'value' => '1,245', 'desc' => 'This Month', 'class' => 'primary'],
-                ['title' => 'Total Clients', 'value' => '230', 'desc' => 'Afghanistan', 'class' => 'pink'],
-                ['title' => 'Trucks In Transit', 'value' => '18', 'desc' => 'Across Border', 'class' => 'purple'],
-                ['title' => 'Pending Payments', 'value' => '؋24,800', 'desc' => 'Unpaid Clients', 'class' => 'warning'],
-                ['title' => 'Suppliers', 'value' => '15', 'desc' => 'Pakistan', 'class' => 'purple'],
-                ['title' => 'Total Purchases', 'value' => '؋1,200,000', 'desc' => 'Lifetime', 'class' => 'warning'],
-                ['title' => 'Total Sales', 'value' => '؋9,000,000', 'desc' => 'Lifetime', 'class' => 'info'],
-                ['title' => 'Total Revenue', 'value' => '؋298,560', 'desc' => 'Delivered', 'class' => 'danger'],
-            ];
-        @endphp
-        @foreach ($stats as $stat)
-            <div class="col-xl-3 col-md-4 col-sm-6">
-                <div class="card bg-gradient-directional-{{ $stat['class'] }}">
-                    <div class="card-content text-white">
-                        <div class="card-body">
-                            <h3 class="card-title text-white">{{ $stat['title'] }}</h3>
-                            <h4 class="card-value text-white">{{ $stat['value'] }}</h4>
-                            <p class="card-desc">{{ $stat['desc'] }}</p>
-                        </div>
-                    </div>
-                    <div class="card-shadow"></div>
-                </div>
+    <div class="dash-cal">
+        <div class="dash-cal-now">
+            <div class="dash-cal-date">
+                <strong>{{ $now->format('j F Y') }}</strong>
+                <span>{{ $now->format('l') }}</span>
             </div>
-        @endforeach
-    </div> --}}
+            <div class="dash-clock" dir="ltr"><x-icon name="clock" set="regular" /> <span>{{ $now->format('h:i') }}</span><span class="dash-clock-rest">{{ $now->format('A') }}</span></div>
+        </div>
+        <ol class="dash-week" aria-label="This week">
+            @php $monday = $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY); @endphp
+            @for ($i = 0; $i < 7; $i++)
+                @php $day = $monday->copy()->addDays($i); @endphp
+                <li class="{{ $day->isToday() ? 'is-today' : '' }} {{ $day->isFriday() ? 'is-off' : '' }}" @if ($day->isToday()) aria-current="date" @endif><span>{{ $day->format('D') }}</span><b>{{ $day->format('j') }}</b></li>
+            @endfor
+        </ol>
+    </div>
+    <div class="dash-site">
+        <div class="dash-plan-head"><span>Website</span><span class="dash-plan-state">Online</span></div>
+        <div class="dash-plan-days"><strong>restdevelopments.com</strong></div>
+        <div class="dash-plan-foot"><span>English, Dari, Pashto, Uzbek</span><a href="{{ url('/') }}" target="_blank" rel="noopener">Open <x-icon name="arrow-up-right-from-square" /></a></div>
+    </div>
+</section>
 
-    <!-- Cement Supply Project Statistics -->
-    {{-- <section id="cement-project-stats">
-        <div class="row">
-            <div class="col-xl-4 col-lg-6 col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Peshawar Cement Supply</h4>
-                        <div class="heading-elements">
-                            <ul class="list-inline d-block mb-0">
-                                <li>
-                                    <a class="btn btn-sm btn-info box-shadow-3 round btn-min-width pull-right" href="#" target="_blank">In Progress</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card-content show collapse">
-                        <div class="card-body pb-1 pt-1">
-                            <h6 class="text-bold-600"> Deliveries Completed:
-                                <span>4/10</span>
-                            </h6>
-                            <div class="progress progress-sm box-shadow-2 mb-0 mt-1">
-                                <div class="progress-bar bg-gradient-x-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="media d-flex">
-                                <div class="align-self-center">
-                                    <h6 class="text-bold-600 mt-2"> Contractor:
-                                        <span class="info">Wahid Builders</span>
-                                    </h6>
-                                    <h6 class="text-bold-600 mt-1"> Deadline:
-                                        <span class="blue-grey">5th June, 2025</span>
-                                    </h6>
-                                </div>
-                                <div class="media-body mt-2 text-right">
-                                    <ul class="list-unstyled users-list">
-                                        <li class="avatar avatar-sm pull-up" data-toggle="tooltip" data-popup="tooltip-custom" data-original-title="Driver A">
-                                            <img class="media-object rounded-circle" src="app-assets/images/portrait/small/avatar-s-19.png" alt="Avatar">
-                                        </li>
-                                        <li class="avatar avatar-sm pull-up" data-toggle="tooltip" data-popup="tooltip-custom" data-original-title="Driver B">
-                                            <img class="media-object rounded-circle" src="app-assets/images/portrait/small/avatar-s-18.png" alt="Avatar">
-                                        </li>
-                                        <li class="avatar avatar-sm pull-up" data-toggle="tooltip" data-popup="tooltip-custom" data-original-title="Driver C">
-                                            <img class="media-object rounded-circle" src="app-assets/images/portrait/small/avatar-s-17.png" alt="Avatar">
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4 col-lg-6 col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Bannu Cement Supply</h4>
-                        <div class="heading-elements">
-                            <ul class="list-inline d-block mb-0">
-                                <li>
-                                    <a class="btn btn-sm btn-warning box-shadow-3 round btn-min-width pull-right" href="#" target="_blank">Completed</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card-content show collapse">
-                        <div class="card-body pb-1 pt-1">
-                            <h6 class="text-bold-600"> Deliveries Completed:
-                                <span>10/10</span>
-                            </h6>
-                            <div class="progress progress-sm box-shadow-2 mb-0 mt-1">
-                                <div class="progress-bar bg-gradient-x-warning" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="media d-flex">
-                                <div class="align-self-center">
-                                    <h6 class="text-bold-600 mt-2"> Contractor:
-                                        <span class="warning">Safi Construction</span>
-                                    </h6>
-                                    <h6 class="text-bold-600 mt-1"> Deadline:
-                                        <span class="blue-grey">11th May, 2025</span>
-                                    </h6>
-                                </div>
-                                <div class="media-body mt-2 text-right">
-                                    <ul class="list-unstyled users-list">
-                                        <li class="avatar avatar-sm pull-up" data-toggle="tooltip" data-popup="tooltip-custom" data-original-title="Driver D">
-                                            <img class="media-object rounded-circle" src="app-assets/images/portrait/small/avatar-s-11.png" alt="Avatar">
-                                        </li>
-                                        <li class="avatar avatar-sm pull-up" data-toggle="tooltip" data-popup="tooltip-custom" data-original-title="Driver E">
-                                            <img class="media-object rounded-circle" src="app-assets/images/portrait/small/avatar-s-12.png" alt="Avatar">
-                                        </li>
-                                        <li class="avatar avatar-sm pull-up" data-toggle="tooltip" data-popup="tooltip-custom" data-original-title="Driver F">
-                                            <img class="media-object rounded-circle" src="app-assets/images/portrait/small/avatar-s-13.png" alt="Avatar">
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4 col-lg-12">
-                <div class="card">
-                    <div class="card-header bg-hexagons">
-                        <h4 class="card-title">Delivery Statistics</h4>
-                        <div class="heading-elements">
-                            <ul class="list-inline d-block mb-0">
-                                <li>
-                                    <a class="btn btn-sm btn-danger danger box-shadow-3 round btn-min-width pull-right" href="#" target="_blank">
-                                        <span class="white">Report</span>
-                                        <i class="ft-bar-chart white pl-1"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card-content show bg-hexagons collapse">
-                        <div class="card-body pb-1 pt-1">
-                            <div class="media d-flex">
-                                <div class="align-self-center width-100">
-                                    <div id="statistics-donut-chart" class="height-100 donutShadow"></div>
-                                </div>
-                                <div class="media-body mt-2 text-right">
-                                    <h3 class="font-large-2 blue-grey lighten-1">35,656</h3>
-                                    <h6 class="mt-1">
-                                        <span class="text-muted">deliveries completed in the
-                                            <a href="#" class="darken-2">last year.</a>
-                                        </span>
-                                    </h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="dc-stats mb-3">
+    @foreach ($tiles as [$label, $icon, $value, $url, $tone])
+        <a class="dc-stat is-link" href="{{ $url }}">
+            <span class="icon-soft {{ $tone }}"><x-icon :name="$icon" /></span>
+            <div class="min-w-0"><div class="dc-stat-value">{{ number_format($value) }}</div><div class="dc-stat-label">{{ $label }}</div></div>
+            <span class="dc-stat-go" aria-hidden="true"><x-icon name="arrow-right" /></span>
+        </a>
+    @endforeach
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-12 col-xl-7">
+        <div class="card h-100 mb-0">
+            <div class="card-header"><h2 class="h5 card-title mb-0">Latest projects</h2><a class="btn btn-sm btn-light-secondary" href="{{ route('admin.projects.index') }}">All projects</a></div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 keep-table">
+                    <thead><tr><th>Project</th><th>Location</th><th>Status</th><th class="text-end">Open</th></tr></thead>
+                    <tbody>
+                        @forelse ($projects as $p)
+                            <tr>
+                                <td><div class="d-flex align-items-center gap-2">@if ($p->image)<img class="recent-thumb" src="{{ asset(str_starts_with($p->image, 'storage/') ? $p->image : 'storage/'.$p->image) }}" alt="">@else<span class="recent-thumb d-inline-block"></span>@endif<span class="fw-semibold">{{ \Illuminate\Support\Str::limit($p->t()?->title, 48) }}</span></div></td>
+                                <td>{{ $p->location ?: '—' }}</td>
+                                <td>@if ($p->status)<span class="badge bg-success-subtle text-success-emphasis">{{ $p->state === 'ongoing' ? 'Under construction' : ucfirst($p->state ?? '') }}</span>@else<span class="badge bg-secondary-subtle text-secondary-emphasis">Hidden</span>@endif</td>
+                                <td class="text-end"><div class="act-group"><x-act kind="view" :href="route('projects.show', ['locale' => 'en', 'slug' => $p->slug])" blank /><a class="btn btn-sm btn-light-secondary" href="{{ url('admin/projects/'.$p->id.'/gallery') }}">Gallery</a></div></td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="4" class="text-center text-muted py-4">No projects yet.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
-    </section> --}}
-
-
-    {{-- Charts Section --}}
-    {{-- <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Project Revenue</h4>
-                </div>
-                <div class="card-body">
-                    <div id="project-revenue-chart" class="height-300"></div>
-                </div>
+    </div>
+    <div class="col-12 col-xl-5">
+        <div class="card h-100 mb-0 dc-wait">
+            <div class="card-header"><h2 class="h5 card-title mb-0">To finish</h2>@if ($checks->count())<span class="badge bg-warning text-dark">{{ $checks->count() }}</span>@endif</div>
+            <div class="card-body">
+                @forelse ($checks as [$text, $url, $tone])
+                    <a class="dc-wait-item" href="{{ $url }}"><span class="dc-wait-dot bg-{{ $tone }}"></span><span class="flex-grow-1">{{ $text }}</span><x-icon name="chevron-right" /></a>
+                @empty
+                    <div class="dc-clear"><span class="icon-soft success"><x-icon name="circle-check" /></span><div><strong>All clear</strong><span>Every recent project has an image and a price.</span></div></div>
+                @endforelse
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">New Purchases Trend</h4>
-                </div>
-                <div class="card-body">
-                    <div id="new-Purchases-chart" class="height-300"></div>
-                </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-12 col-xl-7">
+        <div class="card h-100 mb-0">
+            <div class="card-header"><h2 class="h5 card-title mb-0">Latest news</h2><a class="btn btn-sm btn-light-secondary" href="{{ route('admin.blogs.index') }}">All posts</a></div>
+            <div class="card-body">
+                @forelse ($posts as $post)
+                    <div class="d-flex align-items-center gap-3 py-2 {{ $loop->last ? '' : 'border-bottom' }}">
+                        @if ($post->thumb_small || $post->thumb_large)<img class="recent-thumb" src="{{ asset('storage/'.($post->thumb_small ?: $post->thumb_large)) }}" alt="">@endif
+                        <div class="min-w-0 flex-grow-1"><div class="fw-semibold text-truncate">{{ $post->t()?->title }}</div><small class="text-muted">{{ $post->created_at?->format('j M Y') }}</small></div>
+                        <x-act kind="view" :href="route('blog.show', ['locale' => 'en', 'slug' => $post->slug])" blank />
+                    </div>
+                @empty
+                    <div class="text-muted">No posts yet.</div>
+                @endforelse
             </div>
         </div>
-    </div> --}}
-@endsection
-@section('page-script')
-    <script src="{{ asset('admin/app-assets/vendors/js/charts/chartist.min.js') }}"></script>
-    <script>
-        new Chartist.Line('#project-revenue-chart', {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-            series: [
-                [10000, 12000, 18000, 20000, 25000]
-            ]
-        }, {
-            fullWidth: true,
-            chartPadding: {
-                right: 40
-            },
-            height: '300px'
-        });
-
-        new Chartist.Line('#new-Purchases-chart', {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-            series: [
-                [20, 25, 40, 50, 60]
-            ]
-        }, {
-            fullWidth: true,
-            chartPadding: {
-                right: 40
-            },
-            height: '300px'
-        });
-    </script>
+    </div>
+    <div class="col-12 col-xl-5">
+        <div class="card h-100 mb-0">
+            <div class="card-header"><h2 class="h5 card-title mb-0">Quick actions</h2></div>
+            <div class="card-body d-grid gap-2">
+                <a class="quick-link" href="{{ route('admin.sliders.create') }}"><x-icon name="images" /> Add a home slider</a>
+                <a class="quick-link" href="{{ route('admin.projects.index') }}"><x-icon name="building" /> Add or edit a project</a>
+                <a class="quick-link" href="{{ route('admin.blogs.index') }}"><x-icon name="newspaper" /> Write a news post</a>
+                <a class="quick-link" href="{{ route('admin.careers.index') }}"><x-icon name="user-tie" /> Post a vacancy</a>
+                <a class="quick-link" href="{{ route('admin.contact.edit') }}"><x-icon name="address-book" /> Update contact details</a>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

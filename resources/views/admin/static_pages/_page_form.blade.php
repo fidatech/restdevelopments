@@ -8,8 +8,8 @@
     <ul class="nav nav-tabs small" role="tablist">
         @foreach($locales as $i => $lc)
             <li class="nav-item">
-                <button class="nav-link {{ $i==0?'active':'' }}" data-toggle="tab"
-                        data-target="#{{ $slugId }}-{{ $lc }}" type="button">
+                <button class="nav-link {{ $i==0?'active':'' }}" data-bs-toggle="tab"
+                        data-bs-target="#{{ $slugId }}-{{ $lc }}" type="button">
                     {{ strtoupper($lc) }}
                 </button>
             </li>

@@ -9,7 +9,7 @@
   <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h3>{{ $category->id?'Edit':'Add' }} Category</h3>
-      <a href="{{ route('admin.blog_categories.index') }}" class="btn btn-secondary">Back</a>
+      <a href="{{ route('admin.blog_categories.index') }}" class="btn btn-light-secondary">Back</a>
     </div>
 
     <div class="row g-3">

@@ -4,14 +4,20 @@
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     @endsection
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="handshake" /></span>
+        <div class="page-header-text">
+            <h1>Client Logos</h1>
+        </div>
+    </div>
+    <div class="page-header-actions"><button id="btnAdd" class="btn btn-primary btn-sm">Add New</button></div>
+</div>
 <div class="container-fluid">
     <div class="card page-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Client Logos</h5>
-            <button id="btnAdd" class="btn btn-primary btn-sm">Add New</button>
-        </div>
+        
         <div class="card-body table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-hover">
                 <thead>
                 <tr>
                     <th>Order</th>
@@ -27,8 +33,8 @@
                         <td><img src="{{ asset('storage/'.$client->image) }}" height="50"></td>
                         <td>{{ $client->link }}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning btn-edit" data-id="{{ $client->id }}">Edit</button>
-                            <button class="btn btn-sm btn-danger btn-delete" data-id="{{ $client->id }}">Delete</button>
+                            <button type="button" class="btn-act is-amber btn-edit" data-id="{{ $client->id }}" title="Edit" aria-label="Edit"><x-icon name="pen" /></button>
+                            <button type="button" class="btn-act is-red btn-delete" data-id="{{ $client->id }}" title="Delete" aria-label="Delete"><x-icon name="trash" /></button>
                         </td>
                     </tr>
                 @endforeach
@@ -61,7 +67,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Cancel</button>
             <button class="btn btn-primary">Save</button>
         </div>
       </form>

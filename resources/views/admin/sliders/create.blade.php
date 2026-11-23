@@ -2,11 +2,17 @@
 @section('title', 'Add Slider')
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="images" /></span>
+        <div class="page-header-text">
+            <h1>Add Slider</h1>
+        </div>
+    </div>
+</div>
     <div class="container-fluid">
         <div class="card">
-            <div class="card-header">
-                <h4 class="card-title mb-0"><i class="ft ft-image"></i> Create Slider</h4>
-            </div>
+            
             <div class="card-body p-1">
                 <form id="sliderCreateForm" method="post" action="{{ route('admin.sliders.store') }}" enctype="multipart/form-data" novalidate>
                     @csrf

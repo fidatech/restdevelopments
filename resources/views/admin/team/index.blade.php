@@ -2,14 +2,20 @@
 @section('title', 'Team Members')
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="users" /></span>
+        <div class="page-header-text">
+            <h1>Team Members</h1>
+        </div>
+    </div>
+    <div class="page-header-actions"><a href="{{ route('admin.team.create') }}" class="btn btn-primary btn-sm">Add New</a></div>
+</div>
     <div class="container-fluid">
         <div class="card page-card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Team Members</h5>
-                <a href="{{ route('admin.team.create') }}" class="btn btn-primary btn-sm">Add New</a>
-            </div>
+            
             <div class="card-body table-responsive">
-                <table class="table-bordered table">
+                <table class="table-hover table">
                     <thead>
                         <tr>
                             <th>Order</th>
@@ -29,10 +35,10 @@
                                 <td>{{ $team->t()?->name }}</td>
                                 <td>{{ $team->t()?->position }}</td>
                                 <td>
-                                    <a href="{{ route('admin.team.edit', $team) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <form method="POST" action="{{ route('admin.team.destroy', $team) }}" class="d-inline-block">
+                                    <a href="{{ route('admin.team.edit', $team) }}" class="btn-act is-amber" title="Edit" aria-label="Edit"><x-icon name="pen" /></a>
+                                    <form method="POST" action="{{ route('admin.team.destroy', $team) }}" class="d-inline-block" data-confirm="Delete this team member?" data-confirm-ok="Delete">
                                         @csrf @method('DELETE')
-                                        <button onclick="return confirm('Delete?')" class="btn btn-sm btn-danger">Delete</button>
+                                        <button class="btn-act is-red" title="Delete" aria-label="Delete"><x-icon name="trash" /></button>
                                     </form>
                                 </td>
                             </tr>

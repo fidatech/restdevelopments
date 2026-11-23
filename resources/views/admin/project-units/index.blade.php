@@ -4,129 +4,6 @@
 
 @section('vendor-style')
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --pri: 120, 75, 155;
-            --gold: 195, 155, 110;
-            --ink: 30, 30, 45;
-            --cream: 248, 245, 242;
-            --danger: 200, 70, 85;
-            --r-card: 18px;
-            --sh-sm: 0 6px 20px rgba(0, 0, 0, .06);
-        }
-
-        body {
-            background: rgb(var(--cream));
-        }
-
-        .page-card {
-            border: 0;
-            border-radius: var(--r-card);
-            background: #fff;
-            box-shadow: var(--sh-sm);
-            overflow: hidden;
-        }
-
-        .page-card .card-header {
-            background: linear-gradient(135deg, rgba(var(--pri), .10), rgba(var(--gold), .08));
-            border-bottom: 1px dashed rgba(0, 0, 0, .08);
-            padding: 1rem 1.25rem;
-        }
-
-        .btn-premium {
-            border: 0;
-            border-radius: 999px;
-            padding: .6rem 1.2rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, rgb(var(--pri)), rgba(var(--pri), .92));
-            color: #fff;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            border-radius: 12px;
-            padding: 12px 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .action-btn i {
-            font-size: 1.1em;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-        }
-
-        .btn-units {
-            background: linear-gradient(135deg, rgba(var(--pri), 0.9), rgba(var(--pri), 0.8));
-            color: white;
-        }
-
-        .btn-documents {
-            background: linear-gradient(135deg, #4a6cf7, #6a8eff);
-            color: white;
-        }
-
-        .btn-gallery {
-            background: linear-gradient(135deg, #f75a92, #ff7ead);
-            color: white;
-        }
-
-        .btn-toggle-form {
-            background: linear-gradient(135deg, rgba(var(--gold), 0.9), rgba(var(--gold), 0.8));
-            color: white;
-        }
-
-        .form-container {
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-        }
-
-        .form-container.collapsed {
-            height: 0;
-            overflow: hidden;
-            opacity: 0;
-            margin-bottom: 0;
-        }
-
-        .table-container {
-            transition: all 0.3s ease;
-        }
-
-        .table-container.collapsed {
-            height: 0;
-            overflow: hidden;
-            opacity: 0;
-        }
-
-        .upload-tile {
-            border: 1px dashed rgba(0, 0, 0, .2);
-            border-radius: 14px;
-            padding: 1rem;
-            background: linear-gradient(135deg, #fbf8f4, #f4efe9);
-        }
-
-        .preview {
-            margin-top: .6rem;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #f6f6f8;
-            border: 1px solid rgba(0, 0, 0, .06);
-            --bs-aspect-ratio: 55%;
-        }
-    </style>
 @endsection
 
 @section('content')
@@ -136,25 +13,26 @@
 @endphp
 
 <div class="container-fluid">
-    <div class="card page-card mb-3">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div>
-                <h2 class="mb-0">Units for: {{ $project->translations()->where('locale', app()->getLocale())->first()->title }}</h2>
-                <small class="text-muted">Manage all units for this project</small>
-            </div>
-            <button class="btn btn-toggle-form" id="toggleFormBtn">
-                <i class="fas fa-plus me-1"></i> Add New Unit
-            </button>
+    <div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="house" /></span>
+        <div class="page-header-text">
+            <h1>Units for: {{ $project->translations()->where('locale', app()->getLocale())->first()->title }}</h1>
+            <p class="page-header-sub">Manage all units for this project</p>
         </div>
     </div>
+    <div class="page-header-actions"><button class="btn btn-primary" id="toggleFormBtn">
+                <x-icon name="plus" class="me-1" /> Add New Unit
+            </button></div>
+</div>
 
     <!-- Form Container -->
     <div class="form-container collapsed" id="formContainer">
         <div class="card page-card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0" id="formTitle">Add Unit</h5>
-                <button class="btn btn-sm btn-outline-secondary rounded-pill d-none" id="btnCancelEdit">
-                    <i class="fas fa-rotate-left me-1"></i> Cancel Edit
+                <button class="btn btn-sm btn-light-secondary d-none" id="btnCancelEdit">
+                    <x-icon name="rotate-left" class="me-1" /> Cancel Edit
                 </button>
             </div>
             <div class="card-body">
@@ -191,7 +69,7 @@
                     <ul class="nav nav-tabs" role="tablist">
                         @foreach($locales as $i => $loc)
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link @if($i===0) active @endif" data-toggle="tab" data-target="#tab-{{ $loc }}" type="button" role="tab">
+                            <button class="nav-link @if($i===0) active @endif" data-bs-toggle="tab" data-bs-target="#tab-{{ $loc }}" type="button" role="tab">
                                 {{ strtoupper($loc) }}
                             </button>
                         </li>
@@ -213,8 +91,8 @@
                     </div>
 
                     <div class="d-grid mt-3">
-                        <button class="btn btn-premium" type="submit" id="saveBtn">
-                            <i class="fas fa-save me-2"></i> Save Unit
+                        <button class="btn btn-primary" type="submit" id="saveBtn">
+                            <x-icon name="floppy-disk" class="me-2" /> Save Unit
                         </button>
                     </div>
                 </form>
@@ -230,7 +108,7 @@
                 <small class="text-muted">Edit / delete. Order controls display sequence.</small>
             </div>
             <div class="card-body">
-                <table id="unitsTable" class="table-striped table-bordered w-100 table">
+                <table id="unitsTable" class="table-striped table-hover w-100 table">
                     <thead>
                         <tr>
                             <th>#</th>

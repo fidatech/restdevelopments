@@ -3,186 +3,7 @@
 
 @section('vendor-style')
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.css" rel="stylesheet">
-
-<style>
-    :root {
-        --pri: 120, 75, 155;
-        --gold: 195, 155, 110;
-        --ink: 30, 30, 45;
-        --cream: 248, 245, 242;
-        --danger: 200, 70, 85;
-        --r-card: 12px;
-        --sh-sm: 0 2px 8px rgba(0, 0, 0, .05);
-        --sh-md: 0 4px 12px rgba(0, 0, 0, .08);
-        --transition: all 0.25s cubic-bezier(0.3, 0, 0.4, 1);
-    }
-
-    body {background: rgb(var(--cream));}
-
-    .page-card {
-        border: 0;
-        border-radius: var(--r-card);
-        background: #fff;
-        box-shadow: var(--sh-sm);
-        overflow: hidden;
-        transition: var(--transition);
-    }
-
-    .page-card:hover {
-        box-shadow: var(--sh-md);
-    }
-
-    .page-card .card-header {
-        background: linear-gradient(135deg, rgba(var(--pri),.05), rgba(var(--gold),.03));
-        border-bottom: 1px solid rgba(0,0,0,.05);
-        padding: 1.25rem 1.5rem;
-    }
-
-    .btn-primary {
-        background: rgba(var(--pri), 0.9);
-        border-color: rgba(var(--pri), 0.9);
-    }
-
-    .btn-primary:hover {
-        background: rgba(var(--pri), 1);
-        border-color: rgba(var(--pri), 1);
-    }
-
-    .btn-gold {
-        background: rgba(var(--gold), 0.9);
-        border-color: rgba(var(--gold), 0.9);
-        color: white;
-    }
-
-    .btn-gold:hover {
-        background: rgba(var(--gold), 1);
-        border-color: rgba(var(--gold), 1);
-        color: white;
-    }
-
-    .form-container, .table-container {
-        transition: var(--transition);
-    }
-
-    .collapsed {
-        height: 0 !important;
-        overflow: hidden;
-        opacity: 0;
-        margin-bottom: 0 !important;
-    }
-
-    .nav-tabs .nav-link {
-        color: rgba(var(--ink), 0.7);
-        border: none;
-        padding: 0.75rem 1.25rem;
-        font-weight: 500;
-    }
-
-    .nav-tabs .nav-link.active {
-        color: rgba(var(--pri), 1);
-        border-bottom: 2px solid rgba(var(--pri), 1);
-        background: transparent;
-    }
-
-    .form-section {
-        background: rgba(0,0,0,.02);
-        border-radius: var(--r-card);
-        padding: 1.25rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .form-section-title {
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: rgba(var(--ink), 0.6);
-        margin-bottom: 1rem;
-        font-weight: 600;
-    }
-
-    .form-control, .form-select {
-        border-radius: 6px;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.9rem;
-        border: 1px solid rgba(0,0,0,.1);
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: rgba(var(--pri), 0.5);
-        box-shadow: 0 0 0 0.2rem rgba(var(--pri), 0.1);
-    }
-
-    .note-editor.note-frame {
-        border-radius: 6px;
-        border-color: rgba(0,0,0,.1);
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 0.35rem 0.75rem;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-weight: 500;
-    }
-
-    .status-badge.active {
-        background: rgba(40, 180, 110, 0.1);
-        color: #28a745;
-    }
-
-    .status-badge.inactive {
-        background: rgba(220, 60, 70, 0.1);
-        color: #dc3545;
-    }
-
-    .action-btn {
-        width: 32px;
-        height: 32px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 6px;
-        background: rgba(var(--ink), 0.05);
-        color: rgba(var(--ink), 0.7);
-        border: none;
-        transition: var(--transition);
-    }
-
-    .action-btn:hover {
-        background: rgba(var(--pri), 0.1);
-        color: rgba(var(--pri), 1);
-    }
-
-    .action-btn.delete:hover {
-        background: rgba(var(--danger), 0.1);
-        color: rgba(var(--danger), 1);
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0.5rem 0.75rem;
-        border-radius: 6px !important;
-        border: none !important;
-        margin-left: 0.25rem !important;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background: rgba(var(--pri), 0.1) !important;
-        color: rgba(var(--pri), 1) !important;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background: rgba(var(--pri), 0.1) !important;
-        color: rgba(var(--pri), 1) !important;
-    }
-
-    .tab-content {
-        border: 1px solid rgba(0,0,0,.05);
-        border-top: none;
-        border-radius: 0 0 var(--r-card) var(--r-card);
-        background: #fff;
-    }
-</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -192,25 +13,26 @@
 @endphp
 <div class="container-fluid">
 
-    <div class="card page-card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div>
-                <h2 class="mb-0">Careers Management</h2>
-                <small class="text-muted">Manage job vacancies and applications</small>
-            </div>
-            <button class="btn btn-gold" id="toggleFormBtn">
-                <i class="fas fa-plus me-2"></i> New Vacancy
-            </button>
+    <div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="user-tie" /></span>
+        <div class="page-header-text">
+            <h1>Careers Management</h1>
+            <p class="page-header-sub">Manage job vacancies and applications</p>
         </div>
     </div>
+    <div class="page-header-actions"><button class="btn btn-primary" id="toggleFormBtn">
+                <x-icon name="plus" class="me-2" /> New Vacancy
+            </button></div>
+</div>
 
     <!-- Form CARD -->
     <div class="form-container collapsed" id="formContainer">
         <div class="card page-card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0" id="formTitle">Create New Vacancy</h5>
-                <button class="btn btn-sm btn-outline-secondary rounded-pill d-none" id="btnCancelEdit">
-                    <i class="fas fa-times me-1"></i> Cancel
+                <button class="btn btn-sm btn-light-secondary d-none" id="btnCancelEdit">
+                    <x-icon name="xmark" class="me-1" /> Cancel
                 </button>
             </div>
             <div class="card-body">
@@ -222,8 +44,8 @@
                     <ul class="nav nav-tabs" role="tablist">
                         @foreach($locales as $i => $lc)
                             <li class="nav-item">
-                                <button class="nav-link {{ $i==0?'active':'' }}" data-toggle="tab"
-                                        data-target="#tab-{{ $lc }}" type="button">
+                                <button class="nav-link {{ $i==0?'active':'' }}" data-bs-toggle="tab"
+                                        data-bs-target="#tab-{{ $lc }}" type="button">
                                     {{ strtoupper($lc) }}
                                 </button>
                             </li>
@@ -295,11 +117,11 @@
                     </div>
 
                     <div class="d-flex justify-content-end mt-4">
-                        <button type="button" class="btn btn-outline-secondary me-3 rounded-pill" id="btnResetForm">
-                            <i class="fas fa-undo me-2"></i> Reset
+                        <button type="button" class="btn btn-light-secondary me-3" id="btnResetForm">
+                            <x-icon name="arrow-rotate-left" class="me-2" /> Reset
                         </button>
-                        <button class="btn btn-primary rounded-pill" id="btnSave">
-                            <i class="fas fa-save me-2"></i> <span id="saveText">Save Vacancy</span>
+                        <button class="btn btn-primary" id="btnSave">
+                            <x-icon name="floppy-disk" class="me-2" /> <span id="saveText">Save Vacancy</span>
                         </button>
                     </div>
                 </form>
@@ -339,7 +161,7 @@
 @section('page-script')
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 (function(){
@@ -428,13 +250,9 @@
             }},
             {data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-end', render: function(data, type, row) {
                 return `
-                    <div class="d-flex justify-content-end">
-                        <button onclick="editVacancy(${row.id})" class="action-btn me-2" title="Edit">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                        <button onclick="deleteVacancy(${row.id})" class="action-btn delete" title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                    <div class="act-group">
+                        <button type="button" onclick="editVacancy(${row.id})" class="btn-act is-amber" title="Edit" aria-label="Edit">${ERP.icon('s-pen')}</button>
+                        <button type="button" onclick="deleteVacancy(${row.id})" class="btn-act is-red" title="Delete" aria-label="Delete">${ERP.icon('s-trash')}</button>
                     </div>
                 `;
             }}

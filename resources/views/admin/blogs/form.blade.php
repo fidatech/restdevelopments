@@ -6,6 +6,14 @@
 @endsection
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="newspaper" /></span>
+        <div class="page-header-text">
+            <h1>Admin</h1>
+        </div>
+    </div>
+</div>
 
     @php
         $locales = config('app.locales', ['en', 'fa', 'ps', 'uz']);

@@ -1,0 +1,70 @@
+name: Preview admin panel on the server
+on:
+  push:
+    branches: [redesign/rest-signature]
+    paths: [.github/workflows/preview-admin.yml]
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      HOST: awt-c8-us.afgnoc.com
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Render every admin page with the live data (read only)
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+        run: |
+          set -euo pipefail
+          umask 077
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-admin-stage.XXXXXXXX"')
+          tar -cf - resources/views scripts/validate-admin.php | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          set +e
+          ssh "${ssh_opts[@]}" "$server" "php '$stage/scripts/validate-admin.php' '$stage/resources/views' '$stage/out'"
+          result=$?
+          set -e
+          mkdir -p rendered
+          ssh "${ssh_opts[@]}" "$server" "cd '$stage/out' && tar -cf - *.html" | tar -xf - -C rendered
+          ssh "${ssh_opts[@]}" "$server" "rm -rf '$stage'"
+          ls rendered
+          echo "result=$result" >> "$GITHUB_ENV"
+      - name: Screenshots of the rendered pages
+        run: |
+          set -euo pipefail
+          cd rendered
+          # the new admin assets come from this checkout; everything else from the live site
+          mkdir -p admin-ui && cp -r ../public/admin-ui/* admin-ui/
+          for f in *.html; do sed -i -E 's#https://restdevelopments\.com/admin-ui/#/admin-ui/#g' "$f"; done
+          python3 -m http.server 8123 >/dev/null 2>&1 &
+          cd .. && mkdir -p shots && cd shots && npm init -y >/dev/null && npm i --silent playwright@1.48.2 >/dev/null && npx playwright install chromium >/dev/null
+          cat > shoot.mjs <<'JS'
+          import { chromium } from 'playwright';
+          const pages = process.argv.slice(2);
+          const b = await chromium.launch();
+          for (const [name, w, h] of [['dashboard',1440,900],['projects',1440,900],['sliders',1440,900],['blogs',1440,900],['contact',1440,900],['login',1440,900],['dashboard-m',390,844],['projects-m',390,844]]) {
+            const file = name.replace(/-m$/, '');
+            const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: w > 500 ? 0.5 : 1 });
+            const p = await ctx.newPage();
+            const errs = []; p.on('pageerror', e => errs.push(e.message));
+            await p.goto(`http://127.0.0.1:8123/${file}.html`, { waitUntil: 'networkidle' }).catch(e => errs.push(String(e)));
+            await p.waitForTimeout(2500);
+            const buf = await p.screenshot({ type: 'jpeg', quality: 55, fullPage: true });
+            console.log(name, JSON.stringify(errs));
+            const b64 = buf.toString('base64'); for (let i = 0; i < b64.length; i += 8000) console.log('IMG ' + name + ' ' + b64.slice(i, i + 8000));
+            await ctx.close();
+          }
+          await b.close();
+          JS
+          node shoot.mjs
+      - name: Result of the render
+        run: test "$result" = 0

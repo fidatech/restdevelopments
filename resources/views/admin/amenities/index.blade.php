@@ -4,48 +4,31 @@
 
 @section('vendor-style')
 <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<style>
-    :root { --pri:120,75,155; --gold:195,155,110; --cream:248,245,242; --r-card:18px; --sh-sm:0 6px 20px rgba(0,0,0,.06); }
-    body{background:rgb(var(--cream));}
-    .page-card{border:0;border-radius:var(--r-card);background:#fff;box-shadow:var(--sh-sm);overflow:hidden;}
-    .page-card .card-header{background:linear-gradient(135deg,rgba(var(--pri),.10),rgba(var(--gold),.08));border-bottom:1px dashed rgba(0,0,0,.08);padding:1rem 1.25rem;}
-    .btn-premium{border:0;border-radius:999px;padding:.6rem 1.2rem;font-weight:600;background:linear-gradient(135deg,rgb(var(--pri)),rgba(var(--pri),.92));color:#fff;}
-    .btn-toggle-form{background:linear-gradient(135deg,rgba(var(--gold),.9),rgba(var(--gold),.8));color:#fff;border:0;border-radius:999px;padding:.6rem 1.2rem;font-weight:600;}
-    .form-container{transition:.3s;margin-bottom:20px;}
-    .form-container.collapsed{height:0;overflow:hidden;opacity:0;margin-bottom:0;}
-    .table-container{transition:.3s;}
-    .table-container.collapsed{height:0;overflow:hidden;opacity:0;}
-
-    /* upload tile */
-    .dropzone{text-align:center;cursor:pointer;border:2px dashed rgba(0,0,0,.2);border-radius:14px;padding:2rem;background:linear-gradient(135deg,#fbf8f4,#f4efe9);transition:.2s;}
-    .dropzone:hover{background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.08);}
-    .dropzone.dragover{border-color:rgb(var(--pri));background:#fff;}
-    .preview img{max-height:160px;object-fit:contain;display:block;}
-</style>
 @endsection
 
 @section('content')
 @php $locales = config('app.locales',['en', 'fa', 'ps', 'uz']); @endphp
 <div class="container-fluid">
-  <div class="card page-card mb-3">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <div>
-        <h2 class="mb-0">Amenities</h2>
-        <small class="text-muted">Manage global amenities (image 196×240)</small>
-      </div>
-      <button class="btn btn-toggle-form" id="toggleFormBtn">
-        <i class="fas fa-plus me-1"></i> Add New Amenity
-      </button>
+  <div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="person-swimming" /></span>
+        <div class="page-header-text">
+            <h1>Amenities</h1>
+            <p class="page-header-sub">Manage global amenities (image 196×240)</p>
+        </div>
     </div>
-  </div>
+    <div class="page-header-actions"><button class="btn btn-primary" id="toggleFormBtn">
+        <x-icon name="plus" class="me-1" /> Add New Amenity
+      </button></div>
+</div>
 
   {{-- Form --}}
   <div class="form-container collapsed" id="formContainer">
     <div class="card page-card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 id="formTitle" class="mb-0">Add Amenity</h5>
-        <button class="btn btn-sm btn-outline-secondary rounded-pill d-none" id="btnCancelEdit">
-          <i class="fas fa-rotate-left me-1"></i> Cancel Edit
+        <button class="btn btn-sm btn-light-secondary d-none" id="btnCancelEdit">
+          <x-icon name="rotate-left" class="me-1" /> Cancel Edit
         </button>
       </div>
       <div class="card-body">
@@ -58,7 +41,7 @@
             <div class="col-md-6">
               <label class="form-label">Image (196x240)</label>
               <div class="dropzone" data-preview-target="preview-image">
-                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                <x-icon name="cloud-arrow-up" class="mb-2" />
                 <p class="mb-0"><strong>Drag & drop</strong> or click to upload</p>
                 <small class="text-muted d-block">196×240 (webp/jpg/png)</small>
                 <input type="file" name="image" accept="image/*" hidden>
@@ -69,7 +52,7 @@
             <div class="col-md-6">
               <label class="form-label">Icon (SVG or PNG)</label>
               <div class="dropzone" data-preview-target="preview-icon">
-                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                <x-icon name="cloud-arrow-up" class="mb-2" />
                 <p class="mb-0"><strong>Drag & drop</strong> or click to upload</p>
                 <small class="text-muted d-block">SVG or PNG</small>
                 <input type="file" name="icon" accept=".svg,.png,.jpg,.jpeg" hidden>
@@ -88,7 +71,7 @@
           <ul class="nav nav-tabs">
             @foreach($locales as $i=>$loc)
               <li class="nav-item">
-                <button class="nav-link @if($i===0) active @endif" data-toggle="tab" data-target="#tab-{{ $loc }}" type="button">{{ strtoupper($loc) }}</button>
+                <button class="nav-link @if($i===0) active @endif" data-bs-toggle="tab" data-bs-target="#tab-{{ $loc }}" type="button">{{ strtoupper($loc) }}</button>
               </li>
             @endforeach
           </ul>
@@ -104,7 +87,7 @@
             @endforeach
           </div>
 
-          <button id="saveBtn" class="btn btn-premium mt-2"><i class="fas fa-save me-2"></i> Save Amenity</button>
+          <button id="saveBtn" class="btn btn-primary mt-2"><x-icon name="floppy-disk" class="me-2" /> Save Amenity</button>
         </form>
       </div>
     </div>
@@ -118,7 +101,7 @@
         <small class="text-muted">Edit / delete. Order controls display sequence.</small>
       </div>
       <div class="card-body">
-        <table id="amenitiesTable" class="table table-striped table-bordered w-100">
+        <table id="amenitiesTable" class="table table-striped table-hover w-100">
           <thead>
             <tr>
               <th>#</th><th>Title</th><th>Image</th><th>Icon</th><th>Order</th><th style="width:110px">Actions</th>

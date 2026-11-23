@@ -2,11 +2,17 @@
 @section('title', $item->exists ? 'Edit Why Us Item' : 'Create Why Us Item')
 
 @section('content')
+<div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="award" /></span>
+        <div class="page-header-text">
+            <h1>{{ $item->exists ? 'Edit' : 'Create' }} Item</h1>
+        </div>
+    </div>
+</div>
 <div class="container-fluid">
     <div class="card page-card">
-        <div class="card-header">
-            <h5 class="mb-0">{{ $item->exists ? 'Edit' : 'Create' }}</h5>
-        </div>
+        
         <div class="card-body">
             <form id="itemForm"
                   method="POST"
@@ -43,7 +49,7 @@
                 <ul class="nav nav-tabs" role="tablist">
                     @foreach($locales as $i=>$loc)
                         <li class="nav-item">
-                            <button class="nav-link {{ $i===0?'active':'' }}" data-toggle="tab" data-target="#tab-{{ $loc }}" type="button">
+                            <button class="nav-link {{ $i===0?'active':'' }}" data-bs-toggle="tab" data-bs-target="#tab-{{ $loc }}" type="button">
                                 {{ strtoupper($loc) }}
                             </button>
                         </li>

@@ -3,73 +3,6 @@
 
 @section('vendor-style')
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --pri: 120, 75, 155;
-            --gold: 195, 155, 110;
-            --cream: 248, 245, 242;
-            --r-card: 18px;
-            --sh-sm: 0 6px 20px rgba(0, 0, 0, .06);
-        }
-
-        body {
-            background: rgb(var(--cream));
-        }
-
-        .page-card {
-            border: 0;
-            border-radius: var(--r-card);
-            background: #fff;
-            box-shadow: var(--sh-sm);
-            overflow: hidden;
-        }
-
-        .page-card .card-header {
-            background: linear-gradient(135deg, rgba(var(--pri), .10), rgba(var(--gold), .08));
-            border-bottom: 1px dashed rgba(0, 0, 0, .08);
-            padding: 1rem 1.25rem;
-        }
-
-        .btn-premium {
-            border: 0;
-            border-radius: 999px;
-            padding: .6rem 1.2rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, rgb(var(--pri)), rgba(var(--pri), .92));
-            color: #fff;
-        }
-
-        .btn-toggle-form {
-            background: linear-gradient(135deg, rgba(var(--gold), .9), rgba(var(--gold), .8));
-            color: #fff;
-            border: 0;
-            border-radius: 999px;
-            padding: .6rem 1.2rem;
-            font-weight: 600;
-        }
-
-        .form-container {
-            transition: .3s;
-            margin-bottom: 20px;
-        }
-
-        .form-container.collapsed {
-            height: 0;
-            overflow: hidden;
-            opacity: 0;
-            margin-bottom: 0;
-        }
-
-        .table-container {
-            transition: .3s;
-        }
-
-        .table-container.collapsed {
-            height: 0;
-            overflow: hidden;
-            opacity: 0;
-        }
-    </style>
 @endsection
 
 @section('content')
@@ -80,22 +13,23 @@
 
     <div class="container-fluid">
 
-        <div class="card page-card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h2 class="mb-0">Blog Categories</h2>
-                    <small class="text-muted">Manage blog post categories</small>
-                </div>
-                <button id="toggleFormBtn" class="btn btn-toggle-form"><i class="fas fa-plus me-1"></i> Add New Category</button>
-            </div>
+        <div class="page-header card-soft is-inline">
+    <div class="page-header-main">
+        <span class="page-header-icon"><x-icon name="tags" /></span>
+        <div class="page-header-text">
+            <h1>Blog Categories</h1>
+            <p class="page-header-sub">Manage blog post categories</p>
         </div>
+    </div>
+    <div class="page-header-actions"><button id="toggleFormBtn" class="btn btn-primary"><x-icon name="plus" class="me-1" /> Add New Category</button></div>
+</div>
 
         <!-- Form -->
         <div class="form-container collapsed" id="formContainer">
             <div class="card page-card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 id="formTitle" class="mb-0">Add Category</h5>
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill d-none" id="btnCancelEdit"><i class="fas fa-rotate-left me-1"></i> Cancel</button>
+                    <button class="btn btn-sm btn-light-secondary d-none" id="btnCancelEdit"><x-icon name="rotate-left" class="me-1" /> Cancel</button>
                 </div>
                 <div class="card-body">
                     <form id="catForm" novalidate>
@@ -115,7 +49,7 @@
                         <ul class="nav nav-tabs" role="tablist">
                             @foreach ($locales as $i => $loc)
                                 <li class="nav-item">
-                                    <button class="nav-link {{ $i === 0 ? 'active' : '' }}" data-toggle="tab" data-target="#tab-{{ $loc }}" type="button">
+                                    <button class="nav-link {{ $i === 0 ? 'active' : '' }}" data-bs-toggle="tab" data-bs-target="#tab-{{ $loc }}" type="button">
                                         {{ strtoupper($loc) }}
                                     </button>
                                 </li>
@@ -133,7 +67,7 @@
                             @endforeach
                         </div>
 
-                        <button id="btnSave" class="btn btn-premium w-100 mt-2"><i class="fas fa-save me-2"></i><span id="saveText">Save Category</span></button>
+                        <button id="btnSave" class="btn btn-primary w-100 mt-2"><x-icon name="floppy-disk" class="me-2" /><span id="saveText">Save Category</span></button>
                     </form>
                 </div>
             </div>
@@ -147,7 +81,7 @@
                     <small class="text-muted">Edit / delete</small>
                 </div>
                 <div class="card-body">
-                    <table id="dtCategories" class="table-striped table-bordered w-100 table">
+                    <table id="dtCategories" class="table-striped table-hover w-100 table">
                         <thead>
                             <tr>
                                 <th>#</th>

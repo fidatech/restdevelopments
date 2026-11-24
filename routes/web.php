@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\HomeCounterController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\AboutSettingController;
 use App\Http\Controllers\Admin\AboutSectionController;
+use App\Http\Controllers\Admin\FounderSettingController;
+use App\Http\Controllers\FounderController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\ClientController;
@@ -87,6 +89,7 @@ Route::group([
 ], function () {
     Route::get('/',        [HomeController::class, 'index'])->name('home');
     Route::get('about',    [AboutController::class, 'index'])->name('about');
+    Route::get('founder',  [FounderController::class, 'index'])->name('founder');
 
     // Projects
     Route::get('projects',        [ProjectPublicController::class, 'index'])->name('projects.index');
@@ -136,6 +139,9 @@ Route::prefix('admin')
 
         Route::get('about/settings', [AboutSettingController::class, 'index'])->name('about.settings.index');
         Route::post('about/settings', [AboutSettingController::class, 'store'])->name('about.settings.store');
+
+        Route::get('about/founder', [FounderSettingController::class, 'index'])->name('founder.index');
+        Route::post('about/founder', [FounderSettingController::class, 'store'])->name('founder.store');
 
         Route::resource('about/sections', AboutSectionController::class)->except(['show'])->names('about.sections');
 

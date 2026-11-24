@@ -5,6 +5,8 @@
 @php
     $locale = app()->getLocale();
     $aboutTr = $about?->t();
+    $founder = \App\Models\FounderSetting::with('translations')->where('status', true)->first();
+    $founderTr = $founder?->t();
 @endphp
 @include('partials.page-head', ['image' => asset('assets/img/brand/towers-night.webp'), 'title' => $aboutTr?->title ?? __('About Rest Developments'), 'current' => __('About'), 'kicker' => __('Our company'), 'lead' => $aboutTr?->subtitle])
 
@@ -18,7 +20,23 @@
                 <p class="lead">{{ __('Rest Developments creates residential and mixed-use places across Afghanistan and Uzbekistan. We focus on quality construction, thoughtful design and long-term value for homeowners and investors.') }}</p>
             </div>
         </article>
-        @if($aboutTr?->about_text)
+        @if($founderTr)
+        <article class="feature feature--flip">
+            <div>
+                <span class="eyebrow">{{ __('A message from our founder') }}</span>
+                <blockquote>“{{ $founderTr->quote ?: \Illuminate\Support\Str::limit(trim(strip_tags($founderTr->message ?? '')), 220) }}”</blockquote>
+                <cite>{{ $founderTr->name }}@if($founderTr->position), {{ $founderTr->position }}@endif</cite>
+                <p style="margin-top:28px"><a class="btn btn--line" href="{{ route('founder', ['locale' => $locale]) }}">{{ __('Read the full message') }}</a></p>
+            </div>
+            <div class="feature-media">
+                @if($founder->image)
+                    <img src="{{ media_url($founder->image) }}" alt="{{ $founderTr->name }}" loading="lazy" width="900" height="1125">
+                @else
+                    <img src="{{ asset('assets/img/brand/courtyard.webp') }}" alt="{{ __('Courtyard at Rest Complex') }}" loading="lazy" width="920" height="496">
+                @endif
+            </div>
+        </article>
+        @elseif($aboutTr?->about_text)
         <article class="feature feature--flip">
             <div>
                 <span class="eyebrow">{{ __('A message from our CEO') }}</span>

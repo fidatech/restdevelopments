@@ -98,6 +98,7 @@ $pages = [
     'counters' => '/admin/home-counters',
     'about-settings' => '/admin/about/settings',
     'about-sections' => '/admin/about/sections',
+    'founder' => '/admin/about/founder',
     'projects' => '/admin/projects',
     'units' => $project ? "/admin/projects/$project/units" : null,
     'documents' => $project ? "/admin/projects/$project/documents" : null,

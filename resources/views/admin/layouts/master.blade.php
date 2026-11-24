@@ -19,6 +19,7 @@
         ]],
         ['label' => 'About Us', 'icon' => 'circle-info', 'open' => $is('admin/about*', 'admin/why-us*', 'admin/team*'), 'children' => [
             ['label' => 'About Page', 'url' => route('admin.about.settings.index'), 'current' => $is('admin/about/settings*')],
+            ['label' => 'Founder', 'url' => route('admin.founder.index'), 'current' => $is('admin/about/founder*')],
             ['label' => 'About Sections', 'url' => route('admin.about.sections.index'), 'current' => $is('admin/about/sections*')],
             ['label' => 'Why Choose Us', 'url' => route('admin.why-us.edit'), 'current' => $is('admin/why-us*')],
             ['label' => 'Team Members', 'url' => route('admin.team.index'), 'current' => $is('admin/team*')],

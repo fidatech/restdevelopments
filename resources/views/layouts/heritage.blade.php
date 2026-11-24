@@ -100,12 +100,13 @@
                 </div>
             </div>
             <div class="nav-item has-mega">
-                <button class="nav-trigger" type="button" aria-expanded="false" aria-controls="mega-company" @if(request()->routeIs('about', 'team.*', 'careers.*')) aria-current="page" @endif>{{ __('About Rest') }} <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
+                <button class="nav-trigger" type="button" aria-expanded="false" aria-controls="mega-company" @if(request()->routeIs('about', 'founder', 'team.*', 'careers.*')) aria-current="page" @endif>{{ __('About Rest') }} <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
                 <div class="mega mega--small" id="mega-company">
                     <div class="wrap mega-inner">
                         <div class="mega-col">
                             <h2>{{ __('Company') }}</h2>
                             <a href="{{ route('about', ['locale' => $locale]) }}">{{ __('Our story') }}</a>
+                            <a href="{{ route('founder', ['locale' => $locale]) }}">{{ __('Our founder') }}</a>
                             <a href="{{ route('team.index', ['locale' => $locale]) }}">{{ __('Our people') }}</a>
                             <a href="{{ route('careers.index', ['locale' => $locale]) }}">{{ __('Careers') }}</a>
                         </div>
@@ -190,6 +191,7 @@
         <nav aria-label="{{ __('About') }}">
             <h2>{{ __('About') }}</h2>
             <a href="{{ route('about', ['locale' => $locale]) }}">{{ __('Our story') }}</a>
+            <a href="{{ route('founder', ['locale' => $locale]) }}">{{ __('Our founder') }}</a>
             <a href="{{ route('team.index', ['locale' => $locale]) }}">{{ __('Our people') }}</a>
             <a href="{{ route('careers.index', ['locale' => $locale]) }}">{{ __('Careers') }}</a>
             <a href="{{ route('blog.index', ['locale' => $locale]) }}">{{ __('News') }}</a>

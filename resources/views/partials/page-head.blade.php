@@ -1,8 +1,8 @@
 @php
     $heroImage = $image ?? asset('assets/img/brand/towers.webp');
 @endphp
-<header class="page-hero">
-    <img src="{{ $heroImage }}" alt="" width="1920" height="1080" fetchpriority="high" decoding="async">
+<header class="page-hero{{ !empty($tall) ? ' page-hero--tall' : '' }}">
+    <img src="{{ $heroImage }}" @if(!empty($imagePosition)) style="object-position: {{ $imagePosition }}" @endif alt="" width="1920" height="1080" fetchpriority="high" decoding="async">
     <div class="wrap">
         <nav class="crumbs" aria-label="{{ __('Breadcrumb') }}">
             <a href="{{ route('home', ['locale' => app()->getLocale()]) }}">{{ __('Home') }}</a>

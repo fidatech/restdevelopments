@@ -830,3 +830,5 @@ html[dir="rtl"] .lightbox-nav svg { transform: scaleX(-1); }
   .lightbox-nav.is-next { inset-inline-end: calc(50% - 64px); }
   .gallery { grid-template-columns: 1fr 1fr; grid-auto-rows: 160px; }
 }
+.page-hero--tall { min-height: min(78svh, 760px); }
+.gallery-more { max-width: none; }

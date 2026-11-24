@@ -30,7 +30,7 @@
     $galleryTypes = $project->galleries->pluck('type')->unique()->filter()->values();
     $whatsapp = 'https://api.whatsapp.com/send?phone=+93777578657&text='.rawurlencode('Hello, I would like to know more about '.($tr?->title ?? 'your project'));
 @endphp
-@include('partials.page-head', ['image' => $storageUrl($project->image) ?: asset('assets/img/brand/towers.webp'), 'title' => $tr?->title ?? __('Project'), 'kicker' => $project->location, 'crumbs' => [[__('Projects'), route('projects.index', ['locale' => $locale])]]])
+@include('partials.page-head', ['image' => $storageUrl($project->image) ?: asset('assets/img/brand/towers.webp'), 'title' => $tr?->title ?? __('Project'), 'kicker' => $project->location, 'imagePosition' => '50% 28%', 'tall' => true, 'crumbs' => [[__('Projects'), route('projects.index', ['locale' => $locale])]]])
 
 <nav class="subnav" aria-label="{{ __('On this page') }}" data-subnav>
     <div class="wrap">

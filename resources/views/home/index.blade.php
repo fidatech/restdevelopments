@@ -179,7 +179,8 @@
         @foreach($communities->take(4) as $i => $project)
             @php
                 $tr = $project->t();
-                $extra = $project->galleries?->take(2) ?? collect();
+                $extra = $project->features?->filter(fn ($f) => $f->image)->take(2)->values() ?? collect();
+                if ($extra->count() < 2) $extra = $project->galleries?->take(2) ?? collect();
                 $place = \Illuminate\Support\Str::contains(strtolower($project->location ?? ''), 'termiz') ? __('Mixed-use community') : __('City-centre living');
             @endphp
             <article class="community {{ $i % 2 ? 'community--flip' : '' }}">

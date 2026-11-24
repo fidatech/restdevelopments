@@ -30,7 +30,7 @@
             </div>
             <div class="feature-media">
                 @if($founder->image)
-                    <img src="{{ media_url($founder->image) }}" alt="{{ $founderTr->name }}" loading="lazy" width="900" height="1125">
+                    <img class="is-portrait" src="{{ media_url($founder->image) }}" alt="{{ $founderTr->name }}" loading="lazy" width="900" height="1125">
                 @else
                     <img src="{{ asset('assets/img/brand/courtyard.webp') }}" alt="{{ __('Courtyard at Rest Complex') }}" loading="lazy" width="920" height="496">
                 @endif

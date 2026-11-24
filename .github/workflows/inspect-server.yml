@@ -12,6 +12,9 @@ jobs:
     env:
       HOST: awt-c8-us.afgnoc.com
     steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
       - name: Look at the folders, rewrite rules and app address
         env:
           KEY: ${{ secrets.DEPLOY_SSH_KEY }}
@@ -22,12 +25,9 @@ jobs:
           printf '%s\n' "$KEY" > "$RUNNER_TEMP/k"
           ssh-keyscan -T 10 -t ed25519 "$HOST" > "$RUNNER_TEMP/kh"
           test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/kh" | awk '{print $2}')" = "$FINGERPRINT"
+          scp -i "$RUNNER_TEMP/k" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/kh" scripts/inspect-projects.php "restdevelopments@$HOST:inspect-projects.php"
           ssh -i "$RUNNER_TEMP/k" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/kh" "restdevelopments@$HOST" bash -s <<'SH'
           cd /home/restdevelopments/public_html
-          echo "== cache"; ls -la bootstrap/cache; ls -ld bootstrap/cache; id
-          echo "== migrations"; php artisan migrate:status 2>&1 | tail -15
-          echo "== pending"; php artisan migrate:status 2>&1 | grep -ci pending || true
-          echo "== routes"; ls -la routes; md5sum routes/web.php
-          echo "== db"; grep -E '^DB_CONNECTION=' .env
-          echo "== route cache has founder?"; grep -c founder bootstrap/cache/routes-v7.php 2>/dev/null || true
+          php "$HOME/inspect-projects.php"
+          rm -f "$HOME/inspect-projects.php"
           SH

@@ -745,3 +745,11 @@ html[dir="rtl"] .scroll-hint svg { transform: scaleX(-1); }
   .footer-updates .actions .btn { flex: 1; }
 }
 .facts-wrap > p { color: var(--text); margin: 0 0 8px; }
+
+/* Careers: closed roles */
+.role-side { display: grid; justify-items: end; gap: 12px; text-align: end; }
+.role-side small { color: var(--muted); font-size: 14px; }
+.role-status { display: inline-block; margin-inline-end: 12px; padding: 3px 12px; border-radius: 999px; background: #ecedea; color: #4a4f4a; font-size: 13px; font-weight: 500; }
+.role.is-closed h2 { color: #5b605b; }
+.role.is-closed:hover h2 { color: var(--green); }
+@media (max-width: 640px) { .role-side { justify-items: start; text-align: start; } }

@@ -9,7 +9,11 @@ class CareerController extends Controller
 {
     public function index()
     {
-        $vacancies = Vacancy::where('status', 'active')->get();
+        // open roles first, then closed ones, newest deadline first
+        $vacancies = Vacancy::where('status', 'active')->with('translations')
+            ->orderByDesc('deadline')->get()
+            ->sortBy(fn ($v) => $v->deadline && $v->deadline->endOfDay()->isPast() ? 1 : 0)
+            ->values();
         return view('careers.index', compact('vacancies'));
     }
 

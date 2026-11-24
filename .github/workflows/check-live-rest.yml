@@ -39,12 +39,13 @@ jobs:
             console.log(name, JSON.stringify(errs));
             await ctx.close();
           };
-          await run('founder-desktop', 1440, 900, 'https://restdevelopments.com/en/founder', false);
-          await run('founder-mobile', 390, 844, 'https://restdevelopments.com/en/founder', false);
-          await run('about-desktop', 1440, 900, 'https://restdevelopments.com/en/about', false);
+          await run('rc-desktop', 1440, 900, 'https://restdevelopments.com/en/projects/rest-complex', false);
+          await run('rc-mobile', 390, 844, 'https://restdevelopments.com/en/projects/rest-complex', false);
+          await run('home-desktop', 1440, 900, 'https://restdevelopments.com/en/', false);
           await b.close();
           JS
           node shoot.mjs
 
 # emaar check
 # founder check 2
+# rest complex check

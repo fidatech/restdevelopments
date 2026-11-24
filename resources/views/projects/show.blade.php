@@ -23,6 +23,11 @@
         __('Location') => $project->location ?: __('On request'),
     ];
     $mapQuery = trim(($tr?->title ?? '').', '.($project->location ?? ''), ', ');
+    $highlights = $project->features->filter(fn ($f) => $f->image)->values();
+    $places = $places ?? collect();
+    $placeName = ($shortName ?? '') ?: ($tr?->title ?? '');
+    $galleryGroups = ['exterior' => __('Exterior'), 'interior' => __('Interiors')];
+    $galleryTypes = $project->galleries->pluck('type')->unique()->filter()->values();
     $whatsapp = 'https://api.whatsapp.com/send?phone=+93777578657&text='.rawurlencode('Hello, I would like to know more about '.($tr?->title ?? 'your project'));
 @endphp
 @include('partials.page-head', ['image' => $storageUrl($project->image) ?: asset('assets/img/brand/towers.webp'), 'title' => $tr?->title ?? __('Project'), 'kicker' => $project->location, 'crumbs' => [[__('Projects'), route('projects.index', ['locale' => $locale])]]])
@@ -30,6 +35,7 @@
 <nav class="subnav" aria-label="{{ __('On this page') }}" data-subnav>
     <div class="wrap">
         <a href="#overview">{{ __('Overview') }}</a>
+        @if($highlights->isNotEmpty() || $places->isNotEmpty())<a href="#highlights">{{ __('Highlights') }}</a>@endif
         @if($units->isNotEmpty())<a href="#units">{{ __('Units') }}</a>@endif
         @if($project->galleries->isNotEmpty())<a href="#gallery">{{ __('Gallery') }}</a>@endif
         <a href="#payment">{{ __('Payment plan') }}</a>
@@ -63,16 +69,73 @@
     </div>
 </section>
 
+@if($highlights->isNotEmpty())
+<section class="section section--ink on-dark" id="highlights">
+    <div class="wrap">
+        <div class="section-head">
+            <div><span class="eyebrow">{{ __('Highlights') }}</span><h2>{{ __('Life at') }} {{ $placeName }}</h2></div>
+            <p>{{ __('Everything a family needs, planned inside the community.') }}</p>
+        </div>
+        <div class="highlights">
+            @foreach($highlights as $feature)
+                @php($ft = $feature->t())
+                <figure class="highlight">
+                    <div class="highlight-img"><img src="{{ media_url($feature->image) }}" alt="{{ $ft?->title }}" loading="lazy" decoding="async" width="1440" height="1080"></div>
+                    <figcaption>
+                        <h3>{{ $ft?->title }}</h3>
+                        @if($ft?->description)<p>{{ $ft->description }}</p>@endif
+                    </figcaption>
+                </figure>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+@if($places->isNotEmpty())
+<section class="section"@if($highlights->isEmpty()) id="highlights"@endif>
+    <div class="wrap">
+        <div class="section-head">
+            <div><span class="eyebrow">{{ __('Inside') }} {{ $placeName }}</span><h2>{{ __('Shops, services and leisure') }}</h2></div>
+        </div>
+        <div class="life-grid">
+            @foreach($places as $place)
+                @php($pname = preg_replace('/\s+at\s+.*$/i', '', $place->t()?->title ?? ''))
+                <a class="life-tile" href="{{ route('projects.show', ['locale' => $locale, 'slug' => $place->slug]) }}">
+                    @if($place->image)<img src="{{ media_url($place->image) }}" alt="" loading="lazy" decoding="async" width="600" height="760">@endif
+                    <span class="life-label"><strong>{{ $pname }}</strong><small>{{ \Illuminate\Support\Str::limit(trim(strip_tags($place->t()?->description ?? '')), 80) }}</small></span>
+                    <span class="life-go">@include('partials.arrow')</span>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 @if($project->galleries->isNotEmpty())
 <section class="section section--mist" id="gallery">
     <div class="wrap">
-        <div class="section-head"><div><span class="eyebrow">{{ __('Gallery') }}</span><h2>{{ __('A closer look') }}</h2></div></div>
-        <div class="gallery">
-            @foreach($project->galleries->take(9) as $image)
+        <div class="section-head">
+            <div><span class="eyebrow">{{ __('Gallery') }}</span><h2>{{ __('A closer look') }}</h2></div>
+            @if($galleryTypes->count() > 1)
+                <div class="gallery-tabs" role="group" aria-label="{{ __('Filter photos') }}">
+                    <button type="button" class="is-active" data-gallery-filter="all" aria-pressed="true">{{ __('All') }} <span>{{ $project->galleries->count() }}</span></button>
+                    @foreach($galleryGroups as $type => $label)
+                        @php($n = $project->galleries->where('type', $type)->count())
+                        @if($n)<button type="button" data-gallery-filter="{{ $type }}" aria-pressed="false">{{ $label }} <span>{{ $n }}</span></button>@endif
+                    @endforeach
+                </div>
+            @endif
+        </div>
+        <div class="gallery" data-gallery>
+            @foreach($project->galleries as $image)
                 @php($src = $storageUrl($image->image))
-                <a href="{{ $src }}" target="_blank" rel="noopener"><img src="{{ $src }}" alt="{{ $tr?->title }}, {{ __('photo') }} {{ $loop->iteration }}" loading="lazy" decoding="async" width="800" height="600"></a>
+                <a href="{{ $src }}" data-type="{{ $image->type }}" data-lightbox @if($loop->index >= 9) class="is-extra" @endif><img src="{{ $src }}" alt="{{ $tr?->title }}, {{ $galleryGroups[$image->type] ?? __('photo') }} {{ $loop->iteration }}" loading="lazy" decoding="async" width="800" height="600"></a>
             @endforeach
         </div>
+        @if($project->galleries->count() > 9)
+            <p class="gallery-more"><button class="btn btn--line" type="button" data-gallery-more>{{ __('Show all photos') }} ({{ $project->galleries->count() }})</button></p>
+        @endif
     </div>
 </section>
 @endif
@@ -167,4 +230,10 @@
 </section>
 @endif
 @include('partials.contact-band')
+<div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox-close" type="button" data-lightbox-close aria-label="{{ __('Close') }}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+    <button class="lightbox-nav is-prev" type="button" data-lightbox-prev aria-label="{{ __('Previous') }}"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M11 3L5 9l6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+    <figure><img alt="" data-lightbox-img><figcaption data-lightbox-count></figcaption></figure>
+    <button class="lightbox-nav is-next" type="button" data-lightbox-next aria-label="{{ __('Next') }}"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M7 3l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+</div>
 @endsection

@@ -99,6 +99,7 @@ $pages = [
     'about-settings' => '/admin/about/settings',
     'about-sections' => '/admin/about/sections',
     'founder' => '/admin/about/founder',
+    'highlights' => $project ? "/admin/projects/$project/highlights" : null,
     'projects' => '/admin/projects',
     'units' => $project ? "/admin/projects/$project/units" : null,
     'documents' => $project ? "/admin/projects/$project/documents" : null,

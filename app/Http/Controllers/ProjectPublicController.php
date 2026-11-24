@@ -56,7 +56,12 @@ class ProjectPublicController extends Controller
     }
     public function show(string $locale, string $slug)
     {
-        // If you already handle locale via middleware/group, adjust signature accordingly
+        // addresses that changed: keep old links working
+        $moved = ['duplix-in-termiz' => 'rest-tower'];
+        if (isset($moved[$slug]) && ! Project::where('slug', $slug)->exists()) {
+            return redirect()->route('projects.show', ['locale' => $locale, 'slug' => $moved[$slug]], 301);
+        }
+
         $project = Project::query()
             ->where('slug', $slug)
             ->with([
@@ -68,8 +73,24 @@ class ProjectPublicController extends Controller
                 'units.translations',
                 // project translations (assuming you use it via ->t())
                 'translations',
+                // highlights (amenities with a photo)
+                'features' => fn($q) => $q->orderBy('order'),
+                'features.translations',
             ])
             ->firstOrFail();
+
+        // Places inside this development, e.g. "Gym & Fitness at Rest Complex, Termiz"
+        $enTitle = (string) ($project->translations->firstWhere('locale', 'en')?->title ?? '');
+        $shortName = trim(preg_split('/\s[–—-]\s|,/u', $enTitle)[0] ?? '');
+        $places = collect();
+        if ($shortName !== '' && ! preg_match('/\sat\s/i', $enTitle)) {
+            $places = Project::active()
+                ->where('id', '!=', $project->id)
+                ->whereHas('translations', fn ($t) => $t->where('locale', 'en')->where('title', 'like', '% at '.$shortName.'%'))
+                ->with('translations')
+                ->orderBy('order')
+                ->get();
+        }
 
         // Group documents into buckets
         $docsByType = $project->documents->groupBy('type');
@@ -110,7 +131,7 @@ class ProjectPublicController extends Controller
         $amenities  = collect(); // fill later
         $facilities = collect(); // fill later
 
-        return view('projects.show', compact('project', 'docs', 'units', 'featuredProjects', 'amenities', 'facilities'));
+        return view('projects.show', compact('project', 'docs', 'units', 'featuredProjects', 'amenities', 'facilities', 'places', 'shortName'));
     }
 
     public function latestLaunches()

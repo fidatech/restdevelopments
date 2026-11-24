@@ -1,0 +1,94 @@
+name: Rebuild Rest Complex with new photos
+on:
+  push:
+    branches: [redesign/rest-signature]
+    paths: [.github/workflows/publish-rest-complex.yml]
+permissions:
+  contents: read
+concurrency: restdevelopments-public-theme
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASELINE: cac03124fc2a2dfaa97a406bb5c1d74da0ec110d
+      HOST: awt-c8-us.afgnoc.com
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check JavaScript
+        run: node --check public/assets/js/heritage.js
+      - name: Connect to server
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$KEY" && test -n "$FINGERPRINT"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+      - name: Render the public pages with the new views before publishing
+        run: |
+          set -euo pipefail
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-rest-stage.XXXXXXXX"')
+          tar -cf - resources/views app/Support/helpers.php scripts/validate-heritage.php | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          for uri in /en/ /en/projects /en/projects/rest-tower /en/projects/duplix-in-termiz /__project; do
+            ssh "${ssh_opts[@]}" "$server" "php '$stage/scripts/validate-heritage.php' '$stage/resources/views' '$uri'"
+          done
+          ssh "${ssh_opts[@]}" "$server" "rm -rf '$stage'"
+      - name: Back up route cache, publish files, add the founder tables
+        run: |
+          set -euo pipefail
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          ssh "${ssh_opts[@]}" "$server" 'mkdir -p ~/restdevelopments-backups && cp -p /home/restdevelopments/public_html/bootstrap/cache/routes-v7.php ~/restdevelopments-backups/routes-v7.before-highlights.php && ls -la ~/restdevelopments-backups'
+          mapfile -t files < <(git diff --name-only --diff-filter=AM "$BASELINE" HEAD -- public/assets public/admin-ui resources/views app/Support/helpers.php app/Models app/Http/Controllers routes/web.php database/migrations)
+          printf '%s\n' "${files[@]}"
+          : > rest-manifest.tsv
+          for path in "${files[@]}"; do
+            if expected=$(git rev-parse --verify "$BASELINE:$path" 2>/dev/null); then
+              printf '%s\t%s\n' "$expected" "$path" >> rest-manifest.tsv
+            else
+              printf 'NEW\t%s\n' "$path" >> rest-manifest.tsv
+            fi
+          done
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-rest-release.XXXXXXXX"')
+          tar -cf - "${files[@]}" scripts/deploy-rest-theme.sh scripts/rebuild-rest-complex.php deploy-assets/rest-complex rest-manifest.tsv | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          ssh "${ssh_opts[@]}" "$server" "bash '$stage/scripts/deploy-rest-theme.sh' '$stage'"
+          ssh "${ssh_opts[@]}" "$server" bash -s <<SH
+          set -euo pipefail
+          cd /home/restdevelopments/public_html
+          php artisan migrate --force --path=database/migrations/2026_11_24_120000_add_description_to_project_feature_translations.php
+          dest=storage/app/public/uploads/projects/2/rc-2026
+          test ! -e "\$dest"
+          mkdir -p "\$dest"
+          cp '$stage'/deploy-assets/rest-complex/*.webp "\$dest"/
+          chmod 644 "\$dest"/*.webp
+          ls "\$dest" | wc -l
+          php '$stage/scripts/rebuild-rest-complex.php' '$stage/deploy-assets/rest-complex/manifest.json' uploads/projects/2/rc-2026
+          if ! php artisan route:cache; then
+            cp -p ~/restdevelopments-backups/routes-v7.before-highlights.php bootstrap/cache/routes-v7.php
+            echo "route cache failed, old cache restored"; exit 1
+          fi
+          php artisan route:list --name=highlights
+          rm -rf '$stage'
+          SH
+      - name: Check every page with live data
+        run: |
+          set -euo pipefail
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-rest-stage.XXXXXXXX"')
+          tar -cf - resources/views app/Support/helpers.php scripts/validate-heritage.php scripts/validate-admin.php | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          for uri in /en/ /fa/ /en/about /en/founder /en/projects/rest-complex /fa/projects/rest-complex /en/projects/rest-tower /en/projects /en/latest-launches /en/contact /en/team /en/blog /en/careers /__project /__blog /__career; do
+            ssh "${ssh_opts[@]}" "$server" "php '$stage/scripts/validate-heritage.php' '$stage/resources/views' '$uri'"
+          done
+          ssh "${ssh_opts[@]}" "$server" "php '$stage/scripts/validate-admin.php' '$stage/resources/views' '$stage/admin-out'"
+          ssh "${ssh_opts[@]}" "$server" "rm -rf '$stage'"
+          for u in /en/projects/rest-complex /en/projects/rest-tower /en/projects/duplix-in-termiz /en/projects /storage/uploads/projects/2/rc-2026/rc-cover_1920x1280.webp; do printf '%s ' "$u"; curl -s -o /dev/null -w '%{http_code}\n' "https://restdevelopments.com$u"; done

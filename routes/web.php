@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\AboutSettingController;
 use App\Http\Controllers\Admin\AboutSectionController;
 use App\Http\Controllers\Admin\FounderSettingController;
+use App\Http\Controllers\Admin\ProjectHighlightController;
 use App\Http\Controllers\FounderController;
 use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BlogCategoryController;
@@ -160,6 +161,12 @@ Route::prefix('admin')
         Route::post('projects/{project}/documents',           [ProjectDocumentController::class, 'store'])->name('projects.documents.store');
 
         // Gallery
+        // Highlights (amenities with a photo)
+        Route::get('projects/{project}/highlights',                [ProjectHighlightController::class, 'index'])->name('projects.highlights.index');
+        Route::post('projects/{project}/highlights',               [ProjectHighlightController::class, 'store'])->name('projects.highlights.store');
+        Route::put('projects/{project}/highlights/{highlight}',    [ProjectHighlightController::class, 'update'])->name('projects.highlights.update');
+        Route::delete('projects/{project}/highlights/{highlight}', [ProjectHighlightController::class, 'destroy'])->name('projects.highlights.destroy');
+
         Route::get('projects/{project}/gallery/datatable', [ProjectGalleryController::class, 'datatable'])->name('projects.gallery.datatable');
         Route::resource('projects/{project}/gallery', ProjectGalleryController::class)->except(['show']);
         Route::post('projects/{project}/gallery',           [ProjectGalleryController::class, 'store'])->name('projects.gallery.store');

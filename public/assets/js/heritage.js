@@ -124,6 +124,52 @@
     map.forEach((_, el) => so.observe(el));
   }
 
+  /* Project gallery: filter tabs, show all, lightbox */
+  const gallery = document.querySelector('[data-gallery]');
+  if (gallery) {
+    const links = [...gallery.querySelectorAll('[data-lightbox]')];
+    const tabs = [...document.querySelectorAll('[data-gallery-filter]')];
+    const moreBtn = document.querySelector('[data-gallery-more]');
+    tabs.forEach(tab => tab.addEventListener('click', () => {
+      const type = tab.dataset.galleryFilter;
+      tabs.forEach(t => { const on = t === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-pressed', String(on)); });
+      links.forEach(a => a.classList.toggle('is-hidden', type !== 'all' && a.dataset.type !== type));
+      if (type !== 'all') { gallery.classList.add('is-open'); moreBtn?.parentElement && (moreBtn.parentElement.hidden = true); }
+    }));
+    moreBtn?.addEventListener('click', () => { gallery.classList.add('is-open'); moreBtn.parentElement.hidden = true; });
+
+    const box = document.getElementById('lightbox');
+    const img = box?.querySelector('[data-lightbox-img]');
+    const count = box?.querySelector('[data-lightbox-count]');
+    let list = [], at = 0, opener = null;
+    const show = i => {
+      at = (i + list.length) % list.length;
+      img.src = list[at].href; img.alt = list[at].querySelector('img')?.alt || '';
+      count.textContent = (at + 1) + ' / ' + list.length;
+    };
+    const close = () => { if (!box || box.hidden) return; box.hidden = true; document.body.classList.remove('modal-open'); opener?.focus(); };
+    links.forEach(a => a.addEventListener('click', e => {
+      if (!box) return;
+      e.preventDefault();
+      list = links.filter(l => !l.classList.contains('is-hidden'));
+      opener = a; box.hidden = false; document.body.classList.add('modal-open');
+      show(list.indexOf(a)); box.querySelector('[data-lightbox-close]')?.focus();
+    }));
+    box?.querySelector('[data-lightbox-close]')?.addEventListener('click', close);
+    box?.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => show(at - (rtl ? -1 : 1)));
+    box?.querySelector('[data-lightbox-next]')?.addEventListener('click', () => show(at + (rtl ? -1 : 1)));
+    box?.addEventListener('click', e => { if (e.target === box || e.target.tagName === 'FIGURE') close(); });
+    document.addEventListener('keydown', e => {
+      if (!box || box.hidden) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowRight') show(at + (rtl ? -1 : 1));
+      if (e.key === 'ArrowLeft') show(at - (rtl ? -1 : 1));
+    });
+    let sx = null;
+    box?.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+    box?.addEventListener('touchend', e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) show(at + (dx < 0 ? 1 : -1)); sx = null; });
+  }
+
   /* Home hero slides */
   const hero = document.querySelector('[data-hero]');
   const slides = [...(hero?.querySelectorAll('[data-hero-slide]') || [])];

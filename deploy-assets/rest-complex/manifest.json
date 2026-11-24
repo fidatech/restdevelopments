@@ -1,0 +1,35 @@
+{
+ "main": "rc-cover_1920x1280.webp",
+ "exterior": [
+  "rc-aerial-front.webp",
+  "rc-aerial-city.webp",
+  "rc-elevation.webp",
+  "rc-garden-fountain.webp",
+  "rc-street-view.webp",
+  "rc-street-retail.webp",
+  "rc-towers-close.webp",
+  "rc-garden-walk.webp",
+  "rc-masterplan.webp",
+  "rc-masterplan-aerial.webp",
+  "rc-retail-front.webp",
+  "rc-entrance.webp"
+ ],
+ "interior": [
+  "rc-living-1.webp",
+  "rc-living-2.webp",
+  "rc-living-3.webp",
+  "rc-living-4.webp",
+  "rc-bath-1.webp",
+  "rc-bath-2.webp",
+  "rc-bath-3.webp",
+  "rc-mall-1.webp",
+  "rc-mall-2.webp",
+  "rc-mall-3.webp"
+ ],
+ "highlights": [
+  "rc-hl-garden_1440x1080.webp",
+  "rc-hl-playground_1440x1080.webp",
+  "rc-hl-mall_1440x1080.webp",
+  "rc-hl-retail_1440x1080.webp"
+ ]
+}

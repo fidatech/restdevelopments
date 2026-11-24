@@ -24,18 +24,10 @@ jobs:
           test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/kh" | awk '{print $2}')" = "$FINGERPRINT"
           ssh -i "$RUNNER_TEMP/k" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/kh" "restdevelopments@$HOST" bash -s <<'SH'
           cd /home/restdevelopments/public_html
-          echo "== public_html"; ls -la | head -50
-          echo "== public_html/.htaccess"; cat .htaccess 2>/dev/null || echo none
-          echo "== public/.htaccess"; cat public/.htaccess 2>/dev/null | head -40
-          echo "== index.php at root"; head -60 index.php 2>/dev/null || echo none
-          echo "== env (addresses only)"; grep -E '^(APP_URL|ASSET_URL|APP_ENV|FILESYSTEM_DISK|APP_DEBUG)=' .env || true
-          echo "== storage links"; ls -la public/storage storage 2>&1 | head; ls -ld storage/app/public; ls storage/app/public | head
-          echo "== config cache"; ls -la bootstrap/cache
-          echo "== php"; php -v | head -1
-          echo "== url() of the app"; php artisan tinker --execute="echo url('/'), PHP_EOL, config('app.url'), PHP_EOL;" 2>&1 | tail -3
-          grep -rn "public/" routes/web.php | head
-          echo "== headers"
-          for u in /admin/blogs /public/admin/blogs /login /public/login /storage/ /public/storage/; do printf '%s ' "$u"; curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' "https://restdevelopments.com$u"; done
-          echo "== links in the live login page"; curl -s https://restdevelopments.com/login | grep -o 'https://restdevelopments.com[^"]*' | sort -u | head -20
-          echo "== links in the public home page"; curl -sL https://restdevelopments.com/en/ | grep -o 'https://restdevelopments.com/[a-z]*' | sort | uniq -c | head
+          echo "== cache"; ls -la bootstrap/cache; ls -ld bootstrap/cache; id
+          echo "== migrations"; php artisan migrate:status 2>&1 | tail -15
+          echo "== pending"; php artisan migrate:status 2>&1 | grep -ci pending || true
+          echo "== routes"; ls -la routes; md5sum routes/web.php
+          echo "== db"; grep -E '^DB_CONNECTION=' .env
+          echo "== route cache has founder?"; grep -c founder bootstrap/cache/routes-v7.php 2>/dev/null || true
           SH

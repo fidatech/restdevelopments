@@ -14,7 +14,7 @@
         $pageDescription = trim($__env->yieldContent('description')) ?: 'Rest Developments creates residential and mixed-use places in Afghanistan and Uzbekistan. Explore our company and projects.';
         $pageRoute = request()->route()?->getName();
         $routeParameters = request()->route()?->parameters() ?? [];
-        $publicRoute = in_array($pageRoute, ['home','about','projects.index','projects.show','latest-launches','blog.index','blog.show','team.index','careers.index','careers.show','contact'], true);
+        $publicRoute = in_array($pageRoute, ['home','about','founder','projects.index','projects.show','latest-launches','blog.index','blog.show','team.index','careers.index','careers.show','contact'], true);
         $canonical = $publicRoute ? route($pageRoute, array_merge($routeParameters, ['locale' => $locale])) : url()->current();
         $socialImage = trim($__env->yieldContent('og_image')) ?: asset('assets/img/rest_logo.png');
         $asset = fn (string $path) => asset($path).'?v='.(@filemtime(public_path($path)) ?: '1');
@@ -44,6 +44,7 @@
         @foreach(config('app.available_locales', ['en']) as $alternateLocale)
             <link rel="alternate" hreflang="{{ $alternateLocale }}" href="{{ route($pageRoute, array_merge($routeParameters, ['locale' => $alternateLocale])) }}">
         @endforeach
+        <link rel="alternate" hreflang="x-default" href="{{ route($pageRoute, array_merge($routeParameters, ['locale' => 'en'])) }}">
     @endif
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:site_name" content="Rest Developments">
@@ -132,7 +133,7 @@
                 <summary aria-label="{{ __('Language') }}">{{ strtoupper($locale) }} <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></summary>
                 <div class="lang-menu">
                     @foreach(config('app.available_locales', ['en','ps','fa','uz']) as $language)
-                        <a href="{{ route('lang.switch', ['locale' => $language]) }}" lang="{{ $language }}" hreflang="{{ $language }}" @if($locale === $language) aria-current="true" @endif>{{ $languageNames[$language] ?? strtoupper($language) }}</a>
+                        <a href="{{ $publicRoute ? route($pageRoute, array_merge($routeParameters, ['locale' => $language])) : route('home', ['locale' => $language]) }}" lang="{{ $language }}" hreflang="{{ $language }}" @if($locale === $language) aria-current="true" @endif>{{ $languageNames[$language] ?? strtoupper($language) }}</a>
                     @endforeach
                 </div>
             </details>

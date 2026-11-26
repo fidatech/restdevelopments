@@ -12,7 +12,7 @@ class SitemapController extends Controller
     {
         $urls = [];
         $locales = config('app.available_locales', ['en']);
-        $pages = ['home', 'about', 'projects.index', 'latest-launches', 'blog.index', 'team.index', 'careers.index', 'contact'];
+        $pages = ['home', 'about', 'founder', 'projects.index', 'latest-launches', 'blog.index', 'team.index', 'careers.index', 'contact'];
 
         foreach ($locales as $locale) {
             foreach ($pages as $page) {

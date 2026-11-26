@@ -1,0 +1,65 @@
+name: Publish canonical SEO fixes
+on:
+  push:
+    branches: [redesign/rest-signature]
+    paths: [.github/workflows/publish-canonical-seo.yml]
+permissions:
+  contents: read
+concurrency: restdevelopments-public-theme
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASELINE: 0aaa329e33783afa498b9f8a8e982dc2592c6eb0
+      HOST: awt-c8-us.afgnoc.com
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify host, back up and publish only SEO files
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          FINGERPRINT: ${{ vars.DEPLOY_HOST_FINGERPRINT || secrets.DEPLOY_HOST_FINGERPRINT }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$KEY" && test -n "$FINGERPRINT"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/deploy_key"
+          unset KEY
+          ssh-keyscan -T 10 -p 22 -t ed25519 "$HOST" > "$RUNNER_TEMP/known_hosts"
+          test "$(ssh-keygen -E sha256 -lf "$RUNNER_TEMP/known_hosts" | awk '{print $2}')" = "$FINGERPRINT"
+          ssh_opts=(-p 22 -i "$RUNNER_TEMP/deploy_key" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/known_hosts")
+          server="restdevelopments@$HOST"
+          files=(.htaccess app/Http/Controllers/SitemapController.php resources/views/layouts/heritage.blade.php)
+          php -l app/Http/Controllers/SitemapController.php
+          : > rest-manifest.tsv
+          for path in "${files[@]}"; do
+            printf '%s\t%s\n' "$(git rev-parse "$BASELINE:$path")" "$path" >> rest-manifest.tsv
+          done
+          stage=$(ssh "${ssh_opts[@]}" "$server" 'mktemp -d "$HOME/restdevelopments-seo-release.XXXXXXXX"')
+          tar -cf - "${files[@]}" scripts/deploy-rest-theme.sh rest-manifest.tsv | ssh "${ssh_opts[@]}" "$server" "tar -xf - -C '$stage'"
+          ssh "${ssh_opts[@]}" "$server" "bash '$stage/scripts/deploy-rest-theme.sh' '$stage'" | tee "$RUNNER_TEMP/rest-deploy.log"
+          backup=$(sed -n 's/^Rest theme deployed. Backup: \([^ ]*\) .*/\1/p' "$RUNNER_TEMP/rest-deploy.log")
+          test -n "$backup"
+          verify() {
+            for path in / /about /projects /index.php; do
+              status=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' "https://restdevelopments.com$path") || return 1
+              echo "$path HTTP $status"
+              test "$status" = 301 || return 1
+            done
+            for path in /en /en/about /en/founder /fa /ps /uz; do
+              curl -fsSL --max-time 20 "https://restdevelopments.com$path" -o /tmp/rest-page.html || return 1
+              grep -F "rel=\"canonical\" href=\"https://restdevelopments.com$path\"" /tmp/rest-page.html || return 1
+              grep -F 'hreflang="x-default"' /tmp/rest-page.html || return 1
+            done
+            curl -fsSL --max-time 20 https://restdevelopments.com/sitemap.xml -o /tmp/rest-sitemap.xml || return 1
+            grep -F 'https://restdevelopments.com/en/founder' /tmp/rest-sitemap.xml || return 1
+          }
+          if ! verify; then
+            echo 'Live SEO verification failed; restoring backed-up files.'
+            ssh "${ssh_opts[@]}" "$server" "tar -xzf '$backup' -C /home/restdevelopments/public_html && cd /home/restdevelopments/public_html && (php artisan view:clear || true)"
+            exit 1
+          fi
+
